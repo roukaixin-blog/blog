@@ -2,30 +2,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.1</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
 
     <groupId>com.kai</groupId>
     <artifactId>blog</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
+    <packaging>pom</packaging>
+
     <name>blog</name>
     <description>blog</description>
 
     <properties>
+        <!-- java 版本 -->
         <java.version>17</java.version>
         <!-- spring boot 版本管理 -->
         <spring-boot.version>3.1.1</spring-boot.version>
         <!-- spring cloud 版本管理 -->
         <spring-cloud.version>2022.0.1</spring-cloud.version>
+        <!-- spring cloud alibaba 版本管理 -->
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
+        <!-- snakeyaml 版本 -->
+        <snakeyaml.version>2.0</snakeyaml.version>
     </properties>
 
 
+    <dependencies>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+    </dependencies>
 
     <!-- 依赖管理 -->
     <dependencyManagement>
@@ -58,16 +65,18 @@
 
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.graalvm.buildtools</groupId>
-                <artifactId>native-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.graalvm.buildtools</groupId>
+                    <artifactId>native-maven-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
 </project>
