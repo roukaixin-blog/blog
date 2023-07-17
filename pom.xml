@@ -15,6 +15,9 @@
     <properties>
         <!-- java 版本 -->
         <java.version>17</java.version>
+        <!-- 指定 maven compiler 版本（解决 jdk 版本自动变化问题） -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <!-- spring boot 版本管理 -->
         <spring-boot.version>3.1.1</spring-boot.version>
         <!-- spring cloud 版本管理 -->

@@ -1,0 +1,14 @@
+server:
+  port: 10000
+
+spring:
+  security:
+    user:
+      name: user
+      password: 123456
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      username: root
+      password: 12345678
+    url: jdbc:mysql://127.0.0.1:3306/blog
