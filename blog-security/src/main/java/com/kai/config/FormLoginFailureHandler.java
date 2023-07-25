@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 public class FormLoginFailureHandler implements AuthenticationFailureHandler {
     @Override
-    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException {
         response.setStatus(HttpServletResponse.SC_OK);
         // 告诉 servlet 用 utf-8 转码
         response.setCharacterEncoding("UTF-8");
