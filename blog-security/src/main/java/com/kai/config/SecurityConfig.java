@@ -1,5 +1,7 @@
 package com.kai.config;
 
+import com.kai.handler.FormLoginFailureHandler;
+import com.kai.handler.FormLoginSuccessHandler;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
