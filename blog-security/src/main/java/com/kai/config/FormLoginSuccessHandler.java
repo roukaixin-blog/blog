@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * 登陆成功时处理器
+ *
+ * @author pankx
+ * @date 2023/7/25 下午8:40
+ */
 @Component
 public class FormLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
