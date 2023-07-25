@@ -26,6 +26,8 @@
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <!-- snakeyaml 版本 -->
         <snakeyaml.version>2.0</snakeyaml.version>
+        <!-- native 构建工具版本管理 -->
+        <native-build-tools-plugin.version>0.9.23</native-build-tools-plugin.version>
     </properties>
 
 
@@ -73,10 +75,12 @@
                 <plugin>
                     <groupId>org.graalvm.buildtools</groupId>
                     <artifactId>native-maven-plugin</artifactId>
+                    <version>${native-build-tools-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
