@@ -59,6 +59,9 @@ public class SecurityConfig {
                                 successHandler(formLoginSuccessHandler).
                                 failureHandler(formLoginFailureHandler)
                 ).
+                oauth2Login(oauth2Login -> {
+
+                }).
                 oauth2Client(oauth2Client ->
                         oauth2Client.
                                 clientRegistrationRepository(clientRegistrationRepository())
