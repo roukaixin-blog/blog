@@ -5,14 +5,16 @@
 
     <groupId>com.kai</groupId>
     <artifactId>blog</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
 
     <packaging>pom</packaging>
 
     <name>blog</name>
     <description>blog</description>
+
     <modules>
         <module>common</module>
+        <module>blog-security</module>
     </modules>
 
     <properties>
@@ -31,6 +33,8 @@
         <snakeyaml.version>2.0</snakeyaml.version>
         <!-- native 构建工具版本管理 -->
         <native-build-tools-plugin.version>0.9.23</native-build-tools-plugin.version>
+        <!-- maven 父子项目版本管理 -->
+        <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
     </properties>
 
 
@@ -87,6 +91,16 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${versions-maven-plugin.version}</version>
+                <configuration>
+                    <generateBackupPoms>false</generateBackupPoms>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
