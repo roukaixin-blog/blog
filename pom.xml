@@ -11,6 +11,9 @@
 
     <name>blog</name>
     <description>blog</description>
+    <modules>
+        <module>common</module>
+    </modules>
 
     <properties>
         <!-- java 版本 -->
