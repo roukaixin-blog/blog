@@ -1,7 +1,8 @@
 package com.kai.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
+import com.kai.exception.JsonException;
 
 /**
  * json 操作工具类
@@ -16,8 +17,11 @@ public class JsonUtils {
 
     }
 
-    @SneakyThrows(Throwable.class)
     public static String toJsonString(Object value){
-        return MAPPER.writeValueAsString(value);
+        try {
+            return MAPPER.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new JsonException(e.getMessage());
+        }
     }
 }
