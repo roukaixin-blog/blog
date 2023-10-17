@@ -1,5 +1,7 @@
 package com.kai.handler;
 
+import com.kai.pojo.R;
+import com.kai.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
@@ -23,6 +25,6 @@ public class FormLoginFailureHandler implements AuthenticationFailureHandler {
         response.setCharacterEncoding("UTF-8");
         // 告诉浏览器使用 utf-8 解析数据
         response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write("登录失败");
+        response.getWriter().write(JsonUtils.toJsonString(R.error("登录失败")));
     }
 }

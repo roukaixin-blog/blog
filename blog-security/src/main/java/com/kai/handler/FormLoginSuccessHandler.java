@@ -1,5 +1,7 @@
 package com.kai.handler;
 
+import com.kai.pojo.R;
+import com.kai.utils.JsonUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,6 @@ public class FormLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding("UTF-8");
         // 告诉浏览器使用 utf-8 解析数据
         response.setContentType("text/html;charset=UTF-8");
-        response.getWriter().write("登录成功");
+        response.getWriter().write(JsonUtils.toJsonString(R.success("登录成功",null)));
     }
 }
