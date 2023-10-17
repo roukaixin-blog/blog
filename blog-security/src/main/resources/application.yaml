@@ -6,6 +6,13 @@ spring:
     user:
       name: user
       password: 123456
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: d869548967cd197ad4df
+            client-secret: 6dced609f8539f7fd584a442f5175cb544035690
+            redirect-uri: http://127.0.0.1:10000/login/oauth2/code/github
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
