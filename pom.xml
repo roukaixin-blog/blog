@@ -35,6 +35,8 @@
         <native-build-tools-plugin.version>0.9.23</native-build-tools-plugin.version>
         <!-- maven 父子项目版本管理 -->
         <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
+        <!-- lombok 版本 -->
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
 
@@ -71,6 +73,12 @@
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
