@@ -34,8 +34,6 @@
         <spring-cloud.version>2022.0.1</spring-cloud.version>
         <!-- spring cloud alibaba 版本管理 -->
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
-        <!-- maven 父子项目版本管理 -->
-        <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
         <!-- lombok 版本 -->
         <lombok.version>1.18.30</lombok.version>
         <!-- mysql 驱动版本 -->
@@ -69,7 +67,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>${versions-maven-plugin.version}</version>
                 <configuration>
                     <generateBackupPoms>false</generateBackupPoms>
                 </configuration>
