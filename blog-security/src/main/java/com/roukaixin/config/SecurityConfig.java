@@ -1,15 +1,21 @@
 package com.roukaixin.config;
 
-import com.roukaixin.handler.FormLoginFailureHandler;
-import com.roukaixin.handler.FormLoginSuccessHandler;
-import com.roukaixin.handler.Oauth2LoginFailureHandler;
-import com.roukaixin.handler.Oauth2LoginSuccessHandler;
+import com.roukaixin.service.impl.UsernamePasswordUserDetailsService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.util.List;
 
 /**
  * 自定义 security 配置
@@ -21,53 +27,45 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-    /*
-    CREATE TABLE oauth2_authorized_client (
-        client_registration_id varchar(100) NOT NULL,
-        principal_name varchar(200) NOT NULL,
-        access_token_type varchar(100) NOT NULL,
-        access_token_value blob NOT NULL,
-        access_token_issued_at timestamp NOT NULL,
-        access_token_expires_at timestamp NOT NULL,
-        access_token_scopes varchar(1000) DEFAULT NULL,
-        refresh_token_value blob DEFAULT NULL,
-        refresh_token_issued_at timestamp DEFAULT NULL,
-        created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        PRIMARY KEY (client_registration_id, principal_name)
-    );
-*/
+    private final List<AuthenticationProvider> authenticationProviders;
+
+    @Autowired
+    public SecurityConfig(List<AuthenticationProvider> authenticationProviders) {
+        this.authenticationProviders = authenticationProviders;
+    }
 
     @Resource
-    private FormLoginSuccessHandler formLoginSuccessHandler;
-
-    @Resource
-    private FormLoginFailureHandler formLoginFailureHandler;
-
-    @Resource
-    private Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
-
-    @Resource
-    private Oauth2LoginFailureHandler oauth2LoginFailureHandler;
+    private UsernamePasswordUserDetailsService usernamePasswordUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return
                 http.
                         authorizeHttpRequests(authorizeHttpRequests ->
-                                authorizeHttpRequests.
-                                        anyRequest().authenticated()
-                        ).
-                        formLogin(formLogin ->
-                                formLogin.
-                                        successHandler(formLoginSuccessHandler).
-                                        failureHandler(formLoginFailureHandler)
-                        ).
-                        oauth2Login(oauth2Login ->
-                                oauth2Login.
-                                        successHandler(oauth2LoginSuccessHandler).
-                                        failureHandler(oauth2LoginFailureHandler)
-
+                                authorizeHttpRequests
+                                        .requestMatchers("/authentication/login").permitAll()
+                                        .anyRequest().authenticated()
                         )
                         .build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        authenticationProviders.add(UsernamePasswordAuthenticationProvider());
+        return new ProviderManager(authenticationProviders);
+    }
+
+
+
+    public AuthenticationProvider UsernamePasswordAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setUserDetailsService(usernamePasswordUserDetailsService);
+        return authenticationProvider;
     }
 }
