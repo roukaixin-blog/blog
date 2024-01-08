@@ -1,8 +1,8 @@
-package com.kai.utils;
+package com.roukaixin.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kai.exception.JsonException;
+import com.roukaixin.exception.JsonException;
 
 /**
  * json 操作工具类

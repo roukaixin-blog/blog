@@ -1,4 +1,4 @@
-package com.kai.controller;
+package com.roukaixin.controller;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;

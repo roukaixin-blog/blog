@@ -1,9 +1,9 @@
-package com.kai.config;
+package com.roukaixin.config;
 
-import com.kai.handler.FormLoginFailureHandler;
-import com.kai.handler.FormLoginSuccessHandler;
-import com.kai.handler.Oauth2LoginFailureHandler;
-import com.kai.handler.Oauth2LoginSuccessHandler;
+import com.roukaixin.handler.FormLoginFailureHandler;
+import com.roukaixin.handler.FormLoginSuccessHandler;
+import com.roukaixin.handler.Oauth2LoginFailureHandler;
+import com.roukaixin.handler.Oauth2LoginSuccessHandler;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

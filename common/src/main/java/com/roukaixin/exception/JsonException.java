@@ -1,4 +1,4 @@
-package com.kai.exception;
+package com.roukaixin.exception;
 
 /**
  * json 转化异常

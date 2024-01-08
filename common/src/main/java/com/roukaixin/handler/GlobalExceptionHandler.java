@@ -1,7 +1,7 @@
-package com.kai.handler;
+package com.roukaixin.handler;
 
-import com.kai.exception.JsonException;
-import com.kai.pojo.R;
+import com.roukaixin.exception.JsonException;
+import com.roukaixin.pojo.R;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
