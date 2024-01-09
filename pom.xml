@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.kai</groupId>
+    <groupId>com.roukaixin</groupId>
     <artifactId>blog</artifactId>
     <version>0.0.2</version>
 
