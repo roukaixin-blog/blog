@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 认证控制器
+ *
+ * @author 不北咪
+ * @date 2024/1/8 下午7:35
+ */
 @RestController
 @RequestMapping("/authentication")
 public class AuthenticationController {
