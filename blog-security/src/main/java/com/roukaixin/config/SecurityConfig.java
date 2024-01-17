@@ -42,8 +42,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return
-                http.
-                        csrf(AbstractHttpConfigurer::disable)
+                http
+                        .csrf(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(authorizeHttpRequests ->
                                 authorizeHttpRequests
                                         .requestMatchers(HttpMethod.POST,"/authentication/login").permitAll()
@@ -57,6 +57,10 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+    /**
+     * 自定义 AuthenticationManager
+     * @return 局部 AuthenticationManager
+     */
     @Bean
     public AuthenticationManager authenticationManager() {
         authenticationProviders.add(usernamePasswordAuthenticationProvider());
