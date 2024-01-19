@@ -1,5 +1,9 @@
 package com.roukaixin.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.roukaixin.mapper.UserMapper;
+import com.roukaixin.pojo.User;
+import jakarta.annotation.Resource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.stereotype.Service;
@@ -13,8 +17,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsernamePasswordUserDetailsPasswordServiceImpl implements UserDetailsPasswordService {
 
+    @Resource
+    private UserMapper userMapper;
+
     @Override
     public UserDetails updatePassword(UserDetails user, String newPassword) {
-        return null;
+        User newUser = (User) user;
+        userMapper.update(Wrappers.<User>lambdaUpdate().
+                set(User::getPassword, newPassword).eq(User::getUsername, user.getUsername()));
+        newUser.setPassword(newPassword);
+        return newUser;
     }
 }

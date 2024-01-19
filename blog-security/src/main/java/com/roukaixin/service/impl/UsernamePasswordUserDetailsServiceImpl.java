@@ -1,6 +1,9 @@
 package com.roukaixin.service.impl;
 
-import org.springframework.security.core.userdetails.User;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.roukaixin.mapper.UserMapper;
+import jakarta.annotation.Resource;
+import com.roukaixin.pojo.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,8 +18,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class UsernamePasswordUserDetailsServiceImpl implements UserDetailsService {
 
+    @Resource
+    private UserMapper userMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return User.withUsername("user").password("{noop}123456").roles("USER").build();
+        User user = userMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
+        if (user == null) {
+            throw new UsernameNotFoundException("用户不存在，请注册！");
+        }
+        return user;
     }
 }
