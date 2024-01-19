@@ -1,6 +1,7 @@
 package com.roukaixin.config;
 
-import com.roukaixin.service.impl.UsernamePasswordUserDetailsService;
+import com.roukaixin.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
+import com.roukaixin.service.impl.UsernamePasswordUserDetailsServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,10 @@ public class SecurityConfig {
     }
 
     @Resource
-    private UsernamePasswordUserDetailsService usernamePasswordUserDetailsService;
+    private UsernamePasswordUserDetailsServiceImpl usernamePasswordUserDetailsService;
+
+    @Resource
+    private UsernamePasswordUserDetailsPasswordServiceImpl usernamePasswordUserDetailsPasswordService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -73,6 +77,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         authenticationProvider.setUserDetailsService(usernamePasswordUserDetailsService);
+        authenticationProvider.setUserDetailsPasswordService(usernamePasswordUserDetailsPasswordService);
         return authenticationProvider;
     }
 }
