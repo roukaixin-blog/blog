@@ -2,6 +2,7 @@ package com.roukaixin.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,6 +72,7 @@ public class User implements UserDetails {
      */
     @Getter
     @TableField("is_deleted")
+    @TableLogic
     private boolean deleted;
 
     @TableField(exist = false)
