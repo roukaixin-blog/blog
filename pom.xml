@@ -38,6 +38,10 @@
         <lombok.version>1.18.30</lombok.version>
         <!-- mysql 驱动版本 -->
         <mysql.version>8.2.0</mysql.version>
+        <!-- mybatis plus 版本管理 -->
+        <mybatis-plus-spring-boot3.version>3.5.5</mybatis-plus-spring-boot3.version>
+        <!-- mybatis 版本管理 -->
+        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
     </properties>
 
     <!-- 依赖管理 -->
@@ -57,6 +61,18 @@
                 <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus-spring-boot3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
