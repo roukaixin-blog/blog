@@ -4,7 +4,6 @@ import com.roukaixin.enums.PasswordEncoderEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import java.util.Map;
  * @author 不北咪
  * @date 2024/1/23 上午8:48
  */
-@EnableConfigurationProperties(PasswordEncoderProperties.class)
 @ConfigurationProperties(prefix = "spring.security.password-encoder")
 @Setter
 @Getter
