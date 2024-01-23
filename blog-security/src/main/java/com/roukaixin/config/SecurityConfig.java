@@ -1,5 +1,7 @@
 package com.roukaixin.config;
 
+
+import com.roukaixin.properties.PasswordEncoderProperties;
 import com.roukaixin.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
 import com.roukaixin.service.impl.UsernamePasswordUserDetailsServiceImpl;
 import jakarta.annotation.Resource;
@@ -14,11 +16,12 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 自定义 security 配置
@@ -30,11 +33,19 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final PasswordEncoderProperties passwordEncoderProperties;
+
     private final List<AuthenticationProvider> authenticationProviders;
 
+    private final Map<String, PasswordEncoder> encoders;
+
     @Autowired
-    public SecurityConfig(List<AuthenticationProvider> authenticationProviders) {
+    public SecurityConfig(PasswordEncoderProperties passwordEncoderProperties,
+                          List<AuthenticationProvider> authenticationProviders,
+                          Map<String, PasswordEncoder> encoders) {
+        this.passwordEncoderProperties = passwordEncoderProperties;
         this.authenticationProviders = authenticationProviders;
+        this.encoders = encoders;
     }
 
     @Resource
@@ -56,9 +67,13 @@ public class SecurityConfig {
                         .build();
     }
 
+    /**
+     * 加密方式。BCryptPasswordEncoder、Pbkdf2PasswordEncoder、SCryptPasswordEncoder
+     * @return PasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return new DelegatingPasswordEncoder(passwordEncoderProperties.getEncodingId().getEncodingId(), encoders);
     }
 
     /**
