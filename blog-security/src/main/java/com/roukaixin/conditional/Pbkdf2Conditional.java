@@ -26,13 +26,13 @@ public class Pbkdf2Conditional implements Condition {
             return false;
         } else {
             if (encodingId.equals(PasswordEncoderEnum.PBKDF2)) {
-                // encodingId 为 noop 时，注入 NoOpPasswordEncoder 加密
+                // encodingId 为 pbkdf2Encoder 时，注入 Pbkdf2PasswordEncoder 加密
                 return true;
             } else {
                 String encodersKey = "spring.security.password-encoder.encoders." +
                         PasswordEncoderEnum.PBKDF2.getEncodingId();
-                Boolean noopEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
-                return noopEncoder == null || noopEncoder;
+                Boolean pbkdf2Encoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
+                return pbkdf2Encoder == null ? PasswordEncoderEnum.PBKDF2.isStatus() : pbkdf2Encoder;
             }
         }
     }

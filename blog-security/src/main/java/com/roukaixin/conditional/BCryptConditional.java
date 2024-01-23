@@ -26,13 +26,13 @@ public class BCryptConditional implements Condition {
             return true;
         } else {
             if (encodingId.equals(PasswordEncoderEnum.BCRYPT)) {
-                // encodingId 为 noop 时，注入 NoOpPasswordEncoder 加密
+                // encodingId 为 bcrypt 时，注入 BCryptPasswordEncoder 加密
                 return true;
             } else {
                 String encodersKey = "spring.security.password-encoder.encoders." +
                         PasswordEncoderEnum.BCRYPT.getEncodingId();
-                Boolean noopEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
-                return noopEncoder == null || noopEncoder;
+                Boolean bcryptEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
+                return bcryptEncoder == null ? PasswordEncoderEnum.BCRYPT.isStatus() : bcryptEncoder;
             }
         }
     }

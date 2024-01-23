@@ -32,7 +32,7 @@ public class NoOpConditional implements Condition {
                 String encodersKey = "spring.security.password-encoder.encoders." +
                         PasswordEncoderEnum.NOOP.getEncodingId();
                 Boolean noopEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
-                return noopEncoder != null && noopEncoder;
+                return noopEncoder == null ? PasswordEncoderEnum.NOOP.isStatus() : noopEncoder;
             }
         }
     }

@@ -26,13 +26,13 @@ public class SCryptConditional implements Condition {
             return false;
         } else {
             if (encodingId.equals(PasswordEncoderEnum.SCRYPT)) {
-                // encodingId 为 noop 时，注入 NoOpPasswordEncoder 加密
+                // encodingId 为 scrypt 时，注入 SCryptPasswordEncoder 加密
                 return true;
             } else {
                 String encodersKey = "spring.security.password-encoder.encoders." +
                         PasswordEncoderEnum.SCRYPT.getEncodingId();
-                Boolean noopEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
-                return noopEncoder == null || noopEncoder;
+                Boolean scryptEncoder = context.getEnvironment().getProperty(encodersKey, Boolean.class);
+                return scryptEncoder == null ? PasswordEncoderEnum.SCRYPT.isStatus() : scryptEncoder;
             }
         }
     }
