@@ -1,5 +1,6 @@
 package com.roukaixin.controller;
 
+import com.roukaixin.annotation.NoPermitLogin;
 import jakarta.annotation.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ public class AuthenticationController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/login")
+    @NoPermitLogin
     public Object login() {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "123456");
         Authentication authenticate = authenticationManager.authenticate(token);
