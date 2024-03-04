@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  *
- * @author pankx
+ * @author 不北咪
  * @date 2023/8/27 22:15
  */
 @RequestMapping("/user")

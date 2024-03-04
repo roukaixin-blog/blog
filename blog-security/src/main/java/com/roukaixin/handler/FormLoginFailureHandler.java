@@ -13,7 +13,7 @@ import java.io.IOException;
 /**
  * 登陆失败时处理器
  *
- * @author pankx
+ * @author 不北咪
  * @date 2023/7/25 下午8:42
  */
 @Component

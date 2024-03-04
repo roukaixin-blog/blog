@@ -1,8 +1,5 @@
 package com.roukaixin.service;
 
-import org.springframework.stereotype.Service;
-
-
 /**
  * 认证
  *
@@ -10,7 +7,6 @@ import org.springframework.stereotype.Service;
  * @date 2024/3/4 下午8:50
  */
 
-@Service
 public interface AuthenticationService {
 
     /**

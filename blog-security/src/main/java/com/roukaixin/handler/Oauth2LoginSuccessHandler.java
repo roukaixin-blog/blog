@@ -13,7 +13,7 @@ import java.io.IOException;
 
 /**
  * oauth2 登录成功处理器
- * @author pankx
+ * @author 不北咪
  * @date 2023/8/28 22:13
  */
 @Component

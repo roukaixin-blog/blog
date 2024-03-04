@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * 启动类
- * @author pankx
+ * @author 不北咪
  * @date 2023/7/25 下午8:43
  */
 @SpringBootApplication
