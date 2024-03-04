@@ -1,13 +1,12 @@
 package com.roukaixin.controller;
 
 import com.roukaixin.annotation.NoPermitLogin;
-import jakarta.annotation.Resource;
+import com.roukaixin.service.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 认证控制器
@@ -19,14 +18,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/authentication")
 public class AuthenticationController {
 
-    @Resource
-    private AuthenticationManager authenticationManager;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final AuthenticationService authenticationService;
+
+    @Autowired
+    public AuthenticationController(AuthenticationManager authenticationManager,
+                                    AuthenticationService authenticationService) {
+        this.authenticationManager = authenticationManager;
+        this.authenticationService = authenticationService;
+    }
 
     @PostMapping("/login")
     @NoPermitLogin
     public Object login() {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("user", "123456");
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken("admin", "123456");
         Authentication authenticate = authenticationManager.authenticate(token);
         return authenticate.getAuthorities();
     }
+
+    @GetMapping("/oauth2/authorization/{registrationId}")
+    @NoPermitLogin
+    public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId) {
+        authenticationService.oauth2RequestRedirect(registrationId);
+    }
+
+//    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public SseEmitter see(String id) {
+//        SseEmitter sseEmitter = new SseEmitter(0L);
+//        SSE.put(id, sseEmitter);
+//        HashMap<String, String> map = new HashMap<>(4);
+//        map.put("sse", id);
+//        authenticationService.runShell(sseEmitter,id);
+//        return sseEmitter;
+//    }
 }
