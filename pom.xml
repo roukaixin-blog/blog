@@ -44,6 +44,8 @@
         <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
         <!-- fastjson2 版本管理-->
         <fastjson2.version>2.0.45</fastjson2.version>
+        <!-- guava 版本管理 -->
+        <guava.version>33.0.0-jre</guava.version>
     </properties>
 
     <!-- 依赖管理 -->
@@ -82,6 +84,13 @@
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
