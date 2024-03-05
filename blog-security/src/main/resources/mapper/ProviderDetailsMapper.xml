@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roukaixin.mapper.ProviderDetailsMapper">
+
+    <resultMap id="BaseResultMap" type="com.roukaixin.pojo.ProviderDetails">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="registrationId" column="registration_id" jdbcType="VARCHAR"/>
+            <result property="authorizationUri" column="authorization_uri" jdbcType="VARCHAR"/>
+            <result property="tokenUri" column="token_uri" jdbcType="VARCHAR"/>
+            <result property="userInfoEndpointId" column="user_info_endpoint_id" jdbcType="BIGINT"/>
+            <result property="jwkSetUri" column="jwk_set_uri" jdbcType="VARCHAR"/>
+            <result property="issuerUri" column="issuer_uri" jdbcType="VARCHAR"/>
+            <result property="configurationMetadata" column="configuration_metadata" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,registration_id,authorization_uri,
+        token_uri,user_info_endpoint_id,jwk_set_uri,
+        issuer_uri,configuration_metadata
+    </sql>
+</mapper>
