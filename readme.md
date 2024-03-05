@@ -73,7 +73,7 @@ create table client_registration
     client_authentication_method varchar(32)  not null comment '客户端认证方法',
     authorization_grant_type     varchar(24)  not null comment '认证授权类型',
     redirect_uri                 varchar(255) not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
-    scopes                       varchar(255) not null comment '授权范围',
+    scope                        varchar(255) not null comment '授权范围',
     provider_details_id          bigint       not null comment '提供商详情信息id（provider_details关联）',
     client_name                  varchar(24)  null comment '客户端名字'
 )
@@ -89,6 +89,7 @@ create table provider_details
 (
     id                     bigint        not null comment '主键'
         primary key,
+    registration_id        varchar(24)   not null comment '第三方服务商标识',
     authorization_uri      varchar(255)  not null comment '第三方服务商(github)的登录接口',
     token_uri              varchar(255)  not null comment '第三方服务商(github)获取token的接口',
     user_info_endpoint_id  bigint        not null comment '用户信息端点id',
