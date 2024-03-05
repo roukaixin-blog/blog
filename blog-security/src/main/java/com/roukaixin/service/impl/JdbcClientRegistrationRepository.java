@@ -2,9 +2,14 @@ package com.roukaixin.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.roukaixin.mapper.ClientRegistrationMapper;
+import com.roukaixin.mapper.ProviderDetailsMapper;
+import com.roukaixin.mapper.UserInfoEndpointMapper;
+import com.roukaixin.pojo.ProviderDetails;
+import com.roukaixin.pojo.UserInfoEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthenticationMethod;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.stereotype.Service;
@@ -21,9 +26,17 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
 
     private final ClientRegistrationMapper clientRegistrationMapper;
 
+    private final ProviderDetailsMapper providerDetailsMapper;
+
+    private final UserInfoEndpointMapper userInfoEndpointMapper;
+
     @Autowired
-    public JdbcClientRegistrationRepository(ClientRegistrationMapper clientRegistrationMapper) {
+    public JdbcClientRegistrationRepository(ClientRegistrationMapper clientRegistrationMapper,
+                                            ProviderDetailsMapper providerDetailsMapper,
+                                            UserInfoEndpointMapper userInfoEndpointMapper) {
         this.clientRegistrationMapper = clientRegistrationMapper;
+        this.providerDetailsMapper = providerDetailsMapper;
+        this.userInfoEndpointMapper = userInfoEndpointMapper;
     }
 
     @Override
@@ -35,6 +48,10 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
         if (ObjectUtils.isEmpty(clientRegistration)) {
             throw new RuntimeException("不支持当前第三方登录");
         }
+        ProviderDetails providerDetails = providerDetailsMapper.selectOne(
+                Wrappers.<ProviderDetails>lambdaQuery().eq(ProviderDetails::getRegistrationId, registrationId));
+        UserInfoEndpoint userInfoEndpoint = userInfoEndpointMapper.selectOne(
+                Wrappers.<UserInfoEndpoint>lambdaQuery().eq(UserInfoEndpoint::getId, providerDetails.getUserInfoEndpointId()));
         return ClientRegistration.withRegistrationId(registrationId)
                 .clientId(clientRegistration.getClientId())
                 .clientSecret(clientRegistration.getClientSecret())
@@ -43,7 +60,15 @@ public class JdbcClientRegistrationRepository implements ClientRegistrationRepos
                 .authorizationGrantType(new AuthorizationGrantType(clientRegistration.getAuthorizationGrantType()))
                 .redirectUri(clientRegistration.getRedirectUri())
                 .scope(clientRegistration.getScopes())
-
+                .authorizationUri(providerDetails.getAuthorizationUri())
+                .tokenUri(providerDetails.getTokenUri())
+                .userInfoUri(userInfoEndpoint.getUri())
+                .userInfoAuthenticationMethod(new AuthenticationMethod(
+                        userInfoEndpoint.getAuthenticationMethod().getValue()))
+                .userNameAttributeName(userInfoEndpoint.getUserNameAttributeName())
+                .jwkSetUri(providerDetails.getJwkSetUri())
+                .issuerUri(providerDetails.getIssuerUri())
+                .providerConfigurationMetadata(providerDetails.getConfigurationMetadata())
                 .clientName(clientRegistration.getClientName())
                 .build();
     }
