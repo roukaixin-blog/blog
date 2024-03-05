@@ -93,7 +93,7 @@ create table provider_details
     token_uri              varchar(255)  not null comment '第三方服务商(github)获取token的接口',
     user_info_endpoint_id  bigint        not null comment '用户信息端点id',
     jwk_set_uri            varchar(255)  null,
-    issuer_uri             varchar(255)  not null,
+    issuer_uri             varchar(255)  null,
     configuration_metadata varchar(2000) null comment '配置源数据'
 )
     comment 'oauth2 服务商提供的信息';
