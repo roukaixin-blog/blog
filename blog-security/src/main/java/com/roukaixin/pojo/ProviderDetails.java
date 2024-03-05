@@ -1,7 +1,9 @@
 package com.roukaixin.pojo;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,13 +17,18 @@ import java.util.Map;
  */
 @Setter
 @Getter
-@TableName(value = "provider_details")
+@TableName(value = "provider_details", autoResultMap = true)
 public class ProviderDetails {
 
     /**
      * 主键
      */
     private Long id;
+
+    /**
+     * 第三方服务商标识
+     */
+    private String registrationId;
 
     /**
      * 第三方服务商(github)的登录接口
@@ -45,5 +52,6 @@ public class ProviderDetails {
     /**
      * 配置源数据
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> configurationMetadata;
 }

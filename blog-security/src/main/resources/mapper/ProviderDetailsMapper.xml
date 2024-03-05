@@ -12,7 +12,7 @@
             <result property="userInfoEndpointId" column="user_info_endpoint_id" jdbcType="BIGINT"/>
             <result property="jwkSetUri" column="jwk_set_uri" jdbcType="VARCHAR"/>
             <result property="issuerUri" column="issuer_uri" jdbcType="VARCHAR"/>
-            <result property="configurationMetadata" column="configuration_metadata" jdbcType="VARCHAR"/>
+            <result property="configurationMetadata" column="configuration_metadata" jdbcType="VARCHAR" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
     </resultMap>
 
     <sql id="Base_Column_List">
