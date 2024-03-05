@@ -11,7 +11,9 @@ public interface AuthenticationService {
 
     /**
      * 跳转到第三方登陆页面
+     *
      * @param registrationId 客户端id
+     * @param redirect 前端需要重定向的前端路径
      */
-    void oauth2RequestRedirect(String registrationId);
+    void oauth2RequestRedirect(String registrationId, String redirect);
 }

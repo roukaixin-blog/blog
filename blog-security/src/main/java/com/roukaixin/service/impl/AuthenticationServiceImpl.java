@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
-    public void oauth2RequestRedirect(String registrationId) {
+    public void oauth2RequestRedirect(String registrationId, String redirect) {
 
     }
 

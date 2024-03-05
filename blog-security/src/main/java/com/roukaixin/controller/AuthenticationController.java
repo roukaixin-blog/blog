@@ -40,8 +40,8 @@ public class AuthenticationController {
 
     @GetMapping("/oauth2/authorization/{registrationId}")
     @NoPermitLogin
-    public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId) {
-        authenticationService.oauth2RequestRedirect(registrationId);
+    public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId, String redirect) {
+        authenticationService.oauth2RequestRedirect(registrationId, redirect);
     }
 
 //    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
