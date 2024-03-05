@@ -35,7 +35,7 @@ import java.util.Set;
 /**
  * 自定义 security 配置
  *
- * @author pankx
+ * @author 不北咪
  * @date 2023/6/30 上午11:16
  */
 @EnableWebSecurity
