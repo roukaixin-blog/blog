@@ -1,6 +1,8 @@
 package com.roukaixin.service.impl;
 
 import com.roukaixin.service.AuthenticationService;
+import jakarta.annotation.Resource;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,9 +13,15 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
+
+    @Resource
+    private JdbcClientRegistrationRepository jdbcClientRegistrationRepository;
+
     @Override
     public void oauth2RequestRedirect(String registrationId, String redirect) {
 
+        DefaultOAuth2AuthorizationRequestResolver requestResolver =
+                new DefaultOAuth2AuthorizationRequestResolver(jdbcClientRegistrationRepository, null);
     }
 
 //    @SneakyThrows
