@@ -12,7 +12,7 @@
             <result property="clientAuthenticationMethod" column="client_authentication_method" jdbcType="VARCHAR"/>
             <result property="authorizationGrantType" column="authorization_grant_type" jdbcType="VARCHAR"/>
             <result property="redirectUri" column="redirect_uri" jdbcType="VARCHAR"/>
-            <result property="scopes" column="scopes" jdbcType="VARCHAR"/>
+            <result property="scopes" column="scope" jdbcType="VARCHAR" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
             <result property="providerDetailsId" column="provider_details_id" jdbcType="BIGINT"/>
             <result property="clientName" column="client_name" jdbcType="VARCHAR"/>
     </resultMap>

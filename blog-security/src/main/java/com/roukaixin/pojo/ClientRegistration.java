@@ -1,6 +1,8 @@
 package com.roukaixin.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +16,7 @@ import java.util.Set;
  */
 @Setter
 @Getter
-@TableName(value = "client_registration")
+@TableName(value = "client_registration", autoResultMap = true)
 public class ClientRegistration {
 
     /**
@@ -55,6 +57,7 @@ public class ClientRegistration {
     /**
      * 授权范围
      */
+    @TableField(value = "scope", typeHandler = JacksonTypeHandler.class)
     private Set<String> scopes;
 
     /**
