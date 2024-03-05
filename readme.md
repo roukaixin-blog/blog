@@ -25,3 +25,88 @@ create table sys_user
 )
     comment '用户表';
 ````
+
+## oauth2
+
+> ClientRegistration
+
+客户端注册信息
+````java
+	private String registrationId;
+
+	private String clientId;
+
+	private String clientSecret;
+
+	private ClientAuthenticationMethod clientAuthenticationMethod;
+
+	private AuthorizationGrantType authorizationGrantType;
+
+	private String redirectUri;
+
+	private Set<String> scopes = Collections.emptySet();
+
+	private ProviderDetails providerDetails = new ProviderDetails();
+
+	private String clientName;
+````
+| 字段                         | 说明                  |
+|----------------------------|---------------------|
+| registrationId             | 注册id                |
+| clientId                   | 客户端id               |
+| clientSecret               | 客户端密码               |
+| clientAuthenticationMethod | 授权方法                |
+| authorizationGrantType     | 授权类型                |
+| redirectUri                | 重定向地址（服务的地址）        |
+| scopes                     | 权限                  |
+| providerDetails            | 如 ProviderDetails说明 |
+| clientName                 | 客户端名字               |
+
+````mysql
+create table client_registration
+(
+    id                           bigint       not null comment '主键'
+        primary key,
+    registration_id              varchar(24)  not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
+    client_id                    varchar(128) not null comment '客户端id',
+    client_secret                varchar(128) not null comment '客户端密码',
+    client_authentication_method varchar(32)  not null comment '客户端认证方法',
+    authorization_grant_type     varchar(24)  not null comment '认证授权类型',
+    redirect_uri                 varchar(255) not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
+    scopes                       varchar(255) not null comment '授权范围',
+    provider_details_id          bigint       not null comment '提供商详情信息id（provider_details关联）',
+    client_name                  varchar(24)  null comment '客户端名字'
+)
+    comment '客户端注册信息';
+````
+
+> ProviderDetails
+
+客户端提供的信息。例如：登录接口地址，用户信息接口等
+
+```mysql
+create table provider_details
+(
+    id                     bigint        not null comment '主键'
+        primary key,
+    authorization_uri      varchar(255)  not null comment '第三方服务商(github)的登录接口',
+    token_uri              varchar(255)  not null comment '第三方服务商(github)获取token的接口',
+    user_info_endpoint_id  bigint        not null comment '用户信息端点id',
+    jwk_set_uri            varchar(255)  null,
+    issuer_uri             varchar(255)  not null,
+    configuration_metadata varchar(2000) null comment '配置源数据'
+)
+    comment 'oauth2 服务商提供的信息';
+```
+
+> UserInfoEndpoint
+````mysql
+create table user_info_endpoint
+(
+    id                       bigint       not null comment '主键',
+    uri                      varchar(255) not null comment '获取第三方服务商用户信息接口',
+    authentication_method    varchar(32)  not null comment '认证方法。可选值：header，form，query',
+    user_name_attribute_name varchar(32)  not null comment '第三方用户名的字段'
+)
+    comment '用户信息端点';
+````
