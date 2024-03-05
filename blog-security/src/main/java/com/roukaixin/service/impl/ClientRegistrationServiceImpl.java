@@ -7,10 +7,12 @@ import com.roukaixin.service.ClientRegistrationService;
 import org.springframework.stereotype.Service;
 
 /**
-* @author 不北咪
-* @description 针对表【client_registration(客户端注册信息)】的数据库操作Service实现
-* @createDate 2024-03-05 11:25:53
-*/
+ * 针对表【client_registration(客户端注册信息)】的数据库操作Service实现
+ *
+ * @author 不北咪
+ * @description 针对表【client_registration(客户端注册信息)】的数据库操作Service实现
+ * @createDate 2024-03-05 11:25:53
+ */
 @Service
 public class ClientRegistrationServiceImpl extends ServiceImpl<ClientRegistrationMapper, ClientRegistration>
     implements ClientRegistrationService {
