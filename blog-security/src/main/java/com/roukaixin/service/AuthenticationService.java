@@ -17,6 +17,8 @@ public interface AuthenticationService {
      *
      * @param registrationId 客户端id
      * @param redirect 前端需要重定向的前端路径
+     * @param request 请求
+     * @param response  响应
      */
     void oauth2RequestRedirect(String registrationId, String redirect, HttpServletRequest request, HttpServletResponse response);
 }
