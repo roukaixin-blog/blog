@@ -32,18 +32,6 @@ create table sys_user
 
 客户端注册信息
 
-| 字段                         | 说明                  |
-|----------------------------|---------------------|
-| registrationId             | 注册id                |
-| clientId                   | 客户端id               |
-| clientSecret               | 客户端密码               |
-| clientAuthenticationMethod | 授权方法                |
-| authorizationGrantType     | 授权类型                |
-| redirectUri                | 重定向地址（服务的地址）        |
-| scopes                     | 权限                  |
-| providerDetails            | 如 ProviderDetails说明 |
-| clientName                 | 客户端名字               |
-
 ````mysql
 create table client_registration
 (
@@ -100,41 +88,3 @@ create table user_info_endpoint
 INSERT INTO blog.user_info_endpoint (id, uri, authentication_method, user_name_attribute_name) 
 VALUES (1, 'https://api.github.com/user', 'header', 'id');
 ````
-
-> OAuth2AuthorizationRequest
-
-构建发送 `OAuth2AuthorizationRequest` 认证请求
-
-````java
-	private String authorizationUri;
-
-	private AuthorizationGrantType authorizationGrantType;
-
-	private OAuth2AuthorizationResponseType responseType;
-
-	private String clientId;
-
-	private String redirectUri;
-
-	private Set<String> scopes;
-
-	private String state;
-
-/**
- * scopes 包含 openid，添加 nonce 为 key  value 为 attributes 字段中 nonce 值的 hash 值到 attributes
- */
-private Map<String, Object> additionalParameters;
-
-	private String authorizationRequestUri;
-
-/**
- * scopes 包含 openid，添加 nonce 为 key 到 attributes
- */
-private Map<String, Object> attributes;
-````
-
-- `attributes` 字段，有哪些值
-  - registration_id : 不管什么权限都有
-  - nonce : scopes 包含 openid 才有
-- `additionalParameters` 字段，有哪些值
-  - nonce : scopes 包含 openid 才有
