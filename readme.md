@@ -98,6 +98,7 @@ create table provider_details
     configuration_metadata varchar(2000) null comment '配置源数据'
 )
     comment 'oauth2 服务商提供的信息';
+INSERT INTO blog.provider_details (id, registration_id, authorization_uri, token_uri, user_info_endpoint_id, jwk_set_uri, issuer_uri, configuration_metadata) VALUES (1, 'github', 'https://github.com/login/oauth/authorize', 'https://github.com/login/oauth/access_token', 1, null, null, null);
 ```
 
 > UserInfoEndpoint
@@ -110,4 +111,5 @@ create table user_info_endpoint
     user_name_attribute_name varchar(32)  not null comment '第三方用户名的字段'
 )
     comment '用户信息端点';
+INSERT INTO blog.user_info_endpoint (id, uri, authentication_method, user_name_attribute_name) VALUES (1, 'https://api.github.com/user', 'head', 'id');
 ````
