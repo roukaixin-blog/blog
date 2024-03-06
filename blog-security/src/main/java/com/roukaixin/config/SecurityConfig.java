@@ -141,7 +141,14 @@ public class SecurityConfig {
         // 一个请求的请求方式
         Set<RequestMethod> methods = key.getMethodsCondition().getMethods();
         // 请求 url
-        Set<String> patternValues = key.getDirectPaths();
+        Set<String> patternValues;
+        if (key.getPathPatternsCondition() != null) {
+            patternValues = key.getPathPatternsCondition().getPatternValues();
+        } else if (key.getPatternsCondition() != null) {
+            patternValues = key.getPatternsCondition().getPatterns();
+        } else {
+            return;
+        }
         if (!methods.isEmpty()) {
             methods.forEach(method -> methodNoPermitLogin.putAll(method.asHttpMethod(), patternValues));
         } else if (!patternValues.isEmpty()){
