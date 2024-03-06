@@ -2,6 +2,8 @@ package com.roukaixin.controller;
 
 import com.roukaixin.annotation.NoPermitLogin;
 import com.roukaixin.service.AuthenticationService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,8 +42,10 @@ public class AuthenticationController {
 
     @GetMapping("/oauth2/authorization/{registrationId}")
     @NoPermitLogin
-    public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId, String redirect) {
-        authenticationService.oauth2RequestRedirect(registrationId, redirect);
+    public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId,
+                                      @RequestParam(value = "redirect", required = false) String redirect,
+                                      HttpServletRequest request, HttpServletResponse response) {
+        authenticationService.oauth2RequestRedirect(registrationId, redirect, request, response);
     }
 
 //    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
