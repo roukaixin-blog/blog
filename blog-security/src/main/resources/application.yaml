@@ -16,6 +16,11 @@ spring:
         scrypt: false
         pbkdf2: false
         noop: true
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 12345678
 
 mybatis-plus:
   configuration:
