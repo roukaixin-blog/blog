@@ -31,25 +31,7 @@ create table sys_user
 > ClientRegistration
 
 客户端注册信息
-````java
-	private String registrationId;
 
-	private String clientId;
-
-	private String clientSecret;
-
-	private ClientAuthenticationMethod clientAuthenticationMethod;
-
-	private AuthorizationGrantType authorizationGrantType;
-
-	private String redirectUri;
-
-	private Set<String> scopes = Collections.emptySet();
-
-	private ProviderDetails providerDetails = new ProviderDetails();
-
-	private String clientName;
-````
 | 字段                         | 说明                  |
 |----------------------------|---------------------|
 | registrationId             | 注册id                |
@@ -65,19 +47,19 @@ create table sys_user
 ````mysql
 create table client_registration
 (
-    id                           bigint       not null comment '主键'
-        primary key,
-    registration_id              varchar(24)  not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
-    client_id                    varchar(128) not null comment '客户端id',
-    client_secret                varchar(128) not null comment '客户端密码',
-    client_authentication_method varchar(32)  not null comment '客户端认证方法',
-    authorization_grant_type     varchar(24)  not null comment '认证授权类型',
-    redirect_uri                 varchar(255) not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
-    scope                        varchar(255) not null comment '授权范围',
-    provider_details_id          bigint       not null comment '提供商详情信息id（provider_details关联）',
-    client_name                  varchar(24)  null comment '客户端名字'
+  id                           bigint                                                                 not null comment '主键'
+    primary key,
+  registration_id              varchar(24)                                                            not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
+  client_id                    varchar(128)                                                           not null comment '客户端id',
+  client_secret                varchar(128)                                                           not null comment '客户端密码',
+  client_authentication_method varchar(32)                                                            not null comment '客户端认证方法',
+  authorization_grant_type     varchar(24)                                                            not null comment '认证授权类型',
+  redirect_uri                 varchar(255) default '{baseUrl}/{action}/oauth2/code/{registrationId}' not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
+  scope                        varchar(255)                                                           not null comment '授权范围',
+  provider_details_id          bigint                                                                 not null comment '提供商详情信息id（provider_details关联）',
+  client_name                  varchar(24)                                                            null comment '客户端名字'
 )
-    comment '客户端注册信息';
+  comment '客户端注册信息';
 ````
 
 > ProviderDetails
@@ -98,7 +80,11 @@ create table provider_details
     configuration_metadata varchar(2000) null comment '配置源数据'
 )
     comment 'oauth2 服务商提供的信息';
-INSERT INTO blog.provider_details (id, registration_id, authorization_uri, token_uri, user_info_endpoint_id, jwk_set_uri, issuer_uri, configuration_metadata) VALUES (1, 'github', 'https://github.com/login/oauth/authorize', 'https://github.com/login/oauth/access_token', 1, null, null, null);
+INSERT INTO 
+    blog.provider_details (
+                           id, registration_id, authorization_uri, token_uri, user_info_endpoint_id, 
+                           jwk_set_uri, issuer_uri, configuration_metadata) 
+VALUES (1, 'github', 'https://github.com/login/oauth/authorize', 'https://github.com/login/oauth/access_token', 1, null, null, null);
 ```
 
 > UserInfoEndpoint
@@ -111,5 +97,6 @@ create table user_info_endpoint
     user_name_attribute_name varchar(32)  not null comment '第三方用户名的字段'
 )
     comment '用户信息端点';
-INSERT INTO blog.user_info_endpoint (id, uri, authentication_method, user_name_attribute_name) VALUES (1, 'https://api.github.com/user', 'head', 'id');
+INSERT INTO blog.user_info_endpoint (id, uri, authentication_method, user_name_attribute_name) 
+VALUES (1, 'https://api.github.com/user', 'header', 'id');
 ````
