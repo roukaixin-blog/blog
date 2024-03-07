@@ -19,6 +19,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -72,6 +73,8 @@ public class SecurityConfig {
         Multimap<HttpMethod, String> noPermitLogins = getNoPermitLogins();
         return
                 http
+                        .sessionManagement(sessionManagement ->
+                                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .csrf(AbstractHttpConfigurer::disable)
                         .authorizeHttpRequests(authorizeHttpRequests ->
                                 authorizeHttpRequests
@@ -101,6 +104,7 @@ public class SecurityConfig {
                                                         .toArray(new String[]{})).permitAll()
                                         .anyRequest().authenticated()
                         )
+                        .oauth2Login(Customizer.withDefaults())
                         .build();
     }
 
