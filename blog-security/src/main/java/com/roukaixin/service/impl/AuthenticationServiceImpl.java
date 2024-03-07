@@ -96,18 +96,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         redisTemplate.opsForValue().set(request.getSession().getId(), build);
     }
 
-//    @SneakyThrows
-//    @Async
-//    public void runShell(SseEmitter sseEmitter, String id) {
-//        Runtime runtime = Runtime.getRuntime();
-//        Process exec = runtime.exec(new String[]{"/bin/sh", "-c", "echo 1 && sleep 5 && echo 1"});
-//        BufferedReader reader = exec.inputReader();
-//        String flag;
-//        // SseEmitter sseEmitter = AuthenticationController.sse.get(id);
-//        while ((flag = reader.readLine()) != null) {
-//            sseEmitter.send(flag);
-//        }
-//        sseEmitter.complete();
-//
-//    }
 }
