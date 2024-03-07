@@ -104,7 +104,6 @@ public class SecurityConfig {
                                                         .toArray(new String[]{})).permitAll()
                                         .anyRequest().authenticated()
                         )
-                        .oauth2Login(Customizer.withDefaults())
                         .build();
     }
 
