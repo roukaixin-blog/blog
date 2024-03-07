@@ -44,7 +44,8 @@ public class AuthenticationController {
     @NoPermitLogin
     public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId,
                                       @RequestParam(value = "redirect", required = false) String redirect,
-                                      HttpServletRequest request, HttpServletResponse response) {
+                                      HttpServletRequest request,
+                                      HttpServletResponse response) {
         authenticationService.oauth2RequestRedirect(registrationId, redirect, request, response);
     }
 
