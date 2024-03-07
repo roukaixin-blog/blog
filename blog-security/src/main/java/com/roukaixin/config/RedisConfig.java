@@ -25,9 +25,9 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(RedisSerializer.string());
-        template.setValueSerializer(jackson2JsonRedisSerializer());
+        template.setValueSerializer(RedisSerializer.json());
         template.setHashKeySerializer(RedisSerializer.string());
-        template.setHashValueSerializer(jackson2JsonRedisSerializer());
+        template.setHashValueSerializer(RedisSerializer.json());
         template.afterPropertiesSet();
         return template;
     }
@@ -39,7 +39,8 @@ public class RedisConfig {
 
         // 指定序列化输入的类型，类必须是非final修饰的，final修饰的类，比如String,Integer等会跑出异常。
         // 过时方法：enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL) 等效下面;
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL);
 
         // 使用Jackson2JsonRedisSerializer来序列化和反序列化redis的value值
         return new Jackson2JsonRedisSerializer<>(objectMapper, Object.class);
