@@ -51,9 +51,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private void sendRedirectForAuthorization(HttpServletRequest request, HttpServletResponse response,
                                               OAuth2AuthorizationRequest authorizationRequest) throws IOException {
         if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationRequest.getGrantType())) {
-            saveAuthorizationRequest(authorizationRequest, request, response);
             String state = authorizationRequest.getState();
             Assert.hasText(state, "authorizationRequest.state cannot be empty");
+            saveAuthorizationRequest(authorizationRequest, request, response);
         }
         this.authorizationRedirectStrategy
                 .sendRedirect(request, response, authorizationRequest.getAuthorizationRequestUri());
@@ -64,15 +64,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                           HttpServletResponse response) {
         Assert.notNull(request, "request cannot be null");
         Assert.notNull(response, "response cannot be null");
-        if (authorizationRequest == null) {
-            // 删除 authorizationRequest
-            redisTemplate.delete(request.getSession().getId());
-            return;
-        }
         String state = authorizationRequest.getState();
         Assert.hasText(state, "authorizationRequest.state cannot be empty");
-        // 保存 authorizationRequest
-        redisTemplate.opsForValue().set(request.getSession().getId(), authorizationRequest);
+        // 保存 OAuth2AuthorizationRequest，回调之后会使用到 `OAuth2AuthorizationRequest`
+        com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest build =
+                com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest
+                        .builder()
+                        .authorizationUri(authorizationRequest.getAuthorizationUri())
+                        .authorizationGrantType(authorizationRequest.getGrantType().getValue())
+                        .responseType(authorizationRequest.getResponseType().getValue())
+                        .clientId(authorizationRequest.getClientId())
+                        .redirectUri(authorizationRequest.getRedirectUri())
+                        .scopes(authorizationRequest.getScopes())
+                        .state(authorizationRequest.getState())
+                        .additionalParameters(authorizationRequest.getAdditionalParameters())
+                        .authorizationRequestUri(authorizationRequest.getAuthorizationRequestUri())
+                        .attributes(authorizationRequest.getAttributes())
+                        .build();
+        redisTemplate.opsForValue().set(request.getSession().getId(), build);
     }
 
 //    @SneakyThrows
