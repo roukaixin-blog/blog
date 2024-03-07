@@ -49,6 +49,14 @@ public class AuthenticationController {
         authenticationService.oauth2RequestRedirect(registrationId, redirect, request, response);
     }
 
+    @GetMapping("/login/oauth2/code/{registrationId}")
+    @NoPermitLogin
+    public void loginOauth2Code(@PathVariable String registrationId,
+                                HttpServletRequest request,
+                                HttpServletResponse response) {
+        authenticationService.loginOauth2Code(registrationId, request, response);
+    }
+
 //    @GetMapping(value = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 //    public SseEmitter see(String id) {
 //        SseEmitter sseEmitter = new SseEmitter(0L);

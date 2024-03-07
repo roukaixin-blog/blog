@@ -21,4 +21,12 @@ public interface AuthenticationService {
      * @param response  响应
      */
     void oauth2RequestRedirect(String registrationId, String redirect, HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * 回调地址
+     * @param registrationId 客户端id
+     * @param request 请求
+     * @param response 响应
+     */
+    void loginOauth2Code(String registrationId, HttpServletRequest request, HttpServletResponse response);
 }

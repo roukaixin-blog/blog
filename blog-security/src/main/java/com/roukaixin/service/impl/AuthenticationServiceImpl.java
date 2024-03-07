@@ -48,6 +48,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     }
 
+    @Override
+    public void loginOauth2Code(String registrationId, HttpServletRequest request, HttpServletResponse response) {
+        // 参数中有 code 和 state 或 state 和 error 都是授权响应
+
+        // 获取 OAuth2AuthorizationRequest，从 redis 中获取
+        com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest authorizationRequest =
+                (com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest) redisTemplate.opsForValue()
+                        .get(request.getSession().getId());
+
+
+    }
+
     private void sendRedirectForAuthorization(HttpServletRequest request, HttpServletResponse response,
                                               OAuth2AuthorizationRequest authorizationRequest) throws IOException {
         if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(authorizationRequest.getGrantType())) {
