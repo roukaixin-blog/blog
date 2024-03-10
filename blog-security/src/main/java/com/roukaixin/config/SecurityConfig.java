@@ -4,8 +4,9 @@ package com.roukaixin.config;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.roukaixin.annotation.NoPermitLogin;
-import com.roukaixin.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
-import com.roukaixin.service.impl.UsernamePasswordUserDetailsServiceImpl;
+import com.roukaixin.authorization.service.OAuth2UserServiceImpl;
+import com.roukaixin.authorization.service.UsernamePasswordUserDetailsPasswordServiceImpl;
+import com.roukaixin.authorization.service.UsernamePasswordUserDetailsServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,6 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -65,6 +65,9 @@ public class SecurityConfig {
 
     @Resource
     private UsernamePasswordUserDetailsPasswordServiceImpl usernamePasswordUserDetailsPasswordService;
+
+    @Resource
+    private OAuth2UserServiceImpl oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -191,7 +194,7 @@ public class SecurityConfig {
     public AuthenticationProvider oauth2AuthenticationProvider() {
         return new OAuth2LoginAuthenticationProvider(
                 new DefaultAuthorizationCodeTokenResponseClient(),
-                new DefaultOAuth2UserService()
+                oAuth2UserService
         );
     }
 }

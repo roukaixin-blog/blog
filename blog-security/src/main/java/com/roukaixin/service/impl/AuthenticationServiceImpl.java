@@ -2,6 +2,7 @@ package com.roukaixin.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.roukaixin.authorization.resolver.CustomizeOAuth2AuthorizationRequestResolver;
+import com.roukaixin.authorization.service.JdbcClientRegistrationRepository;
 import com.roukaixin.service.AuthenticationService;
 import com.roukaixin.utils.JsonUtils;
 import jakarta.annotation.Resource;

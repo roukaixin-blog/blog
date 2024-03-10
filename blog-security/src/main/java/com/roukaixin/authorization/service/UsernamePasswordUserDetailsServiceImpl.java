@@ -1,4 +1,4 @@
-package com.roukaixin.service.impl;
+package com.roukaixin.authorization.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.roukaixin.mapper.UserMapper;

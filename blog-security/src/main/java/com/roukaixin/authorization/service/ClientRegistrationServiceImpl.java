@@ -1,4 +1,4 @@
-package com.roukaixin.service.impl;
+package com.roukaixin.authorization.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.roukaixin.mapper.ClientRegistrationMapper;
