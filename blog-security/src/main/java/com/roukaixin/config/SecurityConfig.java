@@ -4,7 +4,6 @@ package com.roukaixin.config;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.roukaixin.annotation.NoPermitLogin;
-import com.roukaixin.properties.PasswordEncoderProperties;
 import com.roukaixin.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
 import com.roukaixin.service.impl.UsernamePasswordUserDetailsServiceImpl;
 import jakarta.annotation.Resource;
@@ -43,8 +42,6 @@ import java.util.Set;
 @Configuration
 public class SecurityConfig {
 
-    private final PasswordEncoderProperties passwordEncoderProperties;
-
     private final List<AuthenticationProvider> authenticationProviders;
 
     private final Map<String, PasswordEncoder> encoders;
@@ -52,11 +49,9 @@ public class SecurityConfig {
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Autowired
-    public SecurityConfig(PasswordEncoderProperties passwordEncoderProperties,
-                          List<AuthenticationProvider> authenticationProviders,
+    public SecurityConfig(List<AuthenticationProvider> authenticationProviders,
                           Map<String, PasswordEncoder> encoders,
                           RequestMappingHandlerMapping requestMappingHandlerMapping) {
-        this.passwordEncoderProperties = passwordEncoderProperties;
         this.authenticationProviders = authenticationProviders;
         this.encoders = encoders;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
@@ -166,7 +161,7 @@ public class SecurityConfig {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new DelegatingPasswordEncoder(passwordEncoderProperties.getEncodingId().getEncodingId(), encoders);
+        return new DelegatingPasswordEncoder(PasswordEncoderConfig.encodingId().getEncodingId(), encoders);
     }
 
     /**
