@@ -21,6 +21,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -171,6 +174,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         authenticationProviders.add(usernamePasswordAuthenticationProvider());
+        authenticationProviders.add(oauth2AuthenticationProvider());
         return new ProviderManager(authenticationProviders);
     }
 
@@ -182,5 +186,12 @@ public class SecurityConfig {
         authenticationProvider.setUserDetailsService(usernamePasswordUserDetailsService);
         authenticationProvider.setUserDetailsPasswordService(usernamePasswordUserDetailsPasswordService);
         return authenticationProvider;
+    }
+
+    public AuthenticationProvider oauth2AuthenticationProvider() {
+        return new OAuth2LoginAuthenticationProvider(
+                new DefaultAuthorizationCodeTokenResponseClient(),
+                new DefaultOAuth2UserService()
+        );
     }
 }

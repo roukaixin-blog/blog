@@ -1,7 +1,9 @@
 package com.roukaixin.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.roukaixin.authorization.resolver.CustomizeOAuth2AuthorizationRequestResolver;
 import com.roukaixin.service.AuthenticationService;
+import com.roukaixin.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +33,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 认证管理器
@@ -62,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             sendRedirectForAuthorization(request, response, authorizationRequest);
         } catch (IOException e) {
-            log.error("", e);
+            log.error("发送请求重定向失败", e);
         }
 
     }
@@ -72,6 +76,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 获取请求参数
         Map<String, String[]> parameterMap = request.getParameterMap();
         MultiValueMap<String, String> params = toMultiMap(parameterMap);
+        // 一定有 state 参数
+        String state = params.getFirst(OAuth2ParameterNames.STATE);
+        if (!StringUtils.hasText(state)) {
+            log.info("回调地址中不包含 state，参数信息：{}", JsonUtils.toJsonString(params));
+            throw new RuntimeException("错误请求");
+        }
         // 判断是否为认证响应,参数中有 code 和 state 或 state 和 error 都是授权响应
         if (!isAuthorizationResponse(params)) {
             // 不是认证响应
@@ -80,7 +90,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 获取 OAuth2AuthorizationRequest，从 redis 中获取
         com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest authorizationRequest =
                 (com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest) redisTemplate.opsForValue()
-                        .get(request.getSession().getId());
+                        .get(Objects.requireNonNull(params.getFirst(OAuth2ParameterNames.STATE)));
         if (authorizationRequest == null) {
             OAuth2Error oauth2Error = new OAuth2Error("authorization_request_not_found");
             throw new RuntimeException(oauth2Error.toString());
@@ -106,7 +116,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         OAuth2LoginAuthenticationToken authenticationResult = (OAuth2LoginAuthenticationToken) authenticationManager
                 .authenticate(authenticationRequest);
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(authenticationResult);
-        log.info("认证信息:{}", authorizedClient);
+        log.info("认证信息:{}", JSON.toJSON(authorizedClient));
     }
 
     private static OAuth2AuthorizedClient getAuthorizedClient(OAuth2LoginAuthenticationToken authenticationResult) {
@@ -193,7 +203,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .attributes(authorizationRequest.getAttributes())
                         .build();
         // 保存到 redis 中，key：state
-        redisTemplate.opsForValue().set(authorizationRequest.getState(), build);
+        redisTemplate.opsForValue().set(authorizationRequest.getState(), build, 5, TimeUnit.MINUTES);
     }
 
 }
