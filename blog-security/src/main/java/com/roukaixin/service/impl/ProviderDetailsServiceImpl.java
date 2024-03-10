@@ -1,9 +1,9 @@
-package com.roukaixin.authorization.service;
+package com.roukaixin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.roukaixin.service.ProviderDetailsService;
 import com.roukaixin.mapper.ProviderDetailsMapper;
 import com.roukaixin.pojo.ProviderDetails;
-import com.roukaixin.service.ProviderDetailsService;
 import org.springframework.stereotype.Service;
 
 /**

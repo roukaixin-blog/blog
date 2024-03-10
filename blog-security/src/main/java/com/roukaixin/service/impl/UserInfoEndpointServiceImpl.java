@@ -1,9 +1,9 @@
-package com.roukaixin.authorization.service;
+package com.roukaixin.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.roukaixin.service.UserInfoEndpointService;
 import com.roukaixin.mapper.UserInfoEndpointMapper;
 import com.roukaixin.pojo.UserInfoEndpoint;
-import com.roukaixin.service.UserInfoEndpointService;
 import org.springframework.stereotype.Service;
 
 /**
