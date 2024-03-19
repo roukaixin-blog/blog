@@ -2,8 +2,7 @@ package com.roukaixin.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.roukaixin.enums.AuthenticationMethodEnum;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * oauth2 用户断点信息
@@ -14,6 +13,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @TableName(value = "user_info_endpoint")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserInfoEndpoint {
 
     /**
