@@ -40,7 +40,7 @@ public class OAuth2ProviderDetailsRunner implements CommandLineRunner {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         CommonOAuth2Provider[] providers = CommonOAuth2Provider.values();
         List<String> registrationIds = Arrays.stream(providers)
