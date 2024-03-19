@@ -1,5 +1,8 @@
 package com.roukaixin.service;
 
+import com.roukaixin.pojo.R;
+import com.roukaixin.pojo.dto.UserDTO;
+import com.roukaixin.pojo.vo.LoginSuccessVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -29,4 +32,12 @@ public interface AuthenticationService {
      * @param response 响应
      */
     void loginOauth2Code(String registrationId, HttpServletRequest request, HttpServletResponse response);
+
+    /**
+     * 登陆
+     * @param user 账号/密码
+     * @return R
+     */
+    R<LoginSuccessVO> login(UserDTO user);
+
 }

@@ -3,6 +3,9 @@ package com.roukaixin.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.roukaixin.authorization.resolver.CustomizeOAuth2AuthorizationRequestResolver;
 import com.roukaixin.authorization.service.impl.JdbcClientRegistrationRepository;
+import com.roukaixin.pojo.R;
+import com.roukaixin.pojo.dto.UserDTO;
+import com.roukaixin.pojo.vo.LoginSuccessVO;
 import com.roukaixin.service.AuthenticationService;
 import com.roukaixin.utils.JsonUtils;
 import jakarta.annotation.Resource;
@@ -11,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
@@ -57,6 +62,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Resource
     private AuthenticationManager authenticationManager;
+
+
+    @Override
+    public R<LoginSuccessVO> login(UserDTO user) {
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
+        Authentication authenticate = authenticationManager.authenticate(token);
+
+        return R.success("登录成功", null);
+    }
 
     @Override
     public void oauth2RequestRedirect(String registrationId, String redirect,
