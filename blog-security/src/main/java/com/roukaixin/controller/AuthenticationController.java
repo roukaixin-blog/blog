@@ -8,7 +8,6 @@ import com.roukaixin.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -22,14 +21,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
 
-    private final AuthenticationManager authenticationManager;
 
     private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager,
-                                    AuthenticationService authenticationService) {
-        this.authenticationManager = authenticationManager;
+    public AuthenticationController(AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 

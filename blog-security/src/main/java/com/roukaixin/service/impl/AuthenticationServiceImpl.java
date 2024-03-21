@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static com.roukaixin.constant.LoginConstant.*;
+
 /**
  * 认证管理器
  *
@@ -72,20 +74,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         Authentication authenticate = authenticationManager.authenticate(token);
-        // 认证成功，生产 token 并保存到 redis
-        // getPrincipal: 用户主体信息
+        // 认证成功，生产 token 并保存到 redis。getPrincipal: 用户主体信息
         User loginUser = (User) authenticate.getPrincipal();
         log.info("用户信息{}", loginUser);
-        redisTemplate.opsForValue().set("login:user:info", loginUser);
+        redisTemplate.opsForValue().set(USER_INFO_SYSTEM + loginUser.getId(), loginUser);
         long issuedAt = System.currentTimeMillis();
-        String accessToken = AesUtils.encrypt("jdb9H6spaVAoTfwiwDiSCw==".getBytes(StandardCharsets.UTF_8)
-                , "system:" + loginUser.getId() + ":" + issuedAt);
-        long expiresAt = issuedAt + 30 * 60 * 1000;
-        String refreshToken = AesUtils.encrypt("jdb9H6spaVAoTfwiwDiSCw==".getBytes(StandardCharsets.UTF_8)
-                , "system:" + loginUser.getId() + ":" + expiresAt);
+        long expiresAt = issuedAt + EXPIRES_TIME;
+        String accessToken = AesUtils.encrypt(AES_KEY_ACCESS_TOKEN.getBytes(StandardCharsets.UTF_8)
+                , SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
+        String refreshToken = AesUtils.encrypt(AES_KEY_REFRESH_TOKEN.getBytes(StandardCharsets.UTF_8)
+                , SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
+        redisTemplate.opsForValue().set(USER_ACCESS_TOKEN_SYSTEM + loginUser.getId(),
+                accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(USER_REFRESH_TOKEN_SYSTEM + loginUser.getId(),
+                refreshToken, EXPIRES_TIME * 60, TimeUnit.MILLISECONDS);
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()
-                .tokenType("Bearer")
+                .tokenType(TOKEN_TYPE)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .issuedAt(issuedAt)
