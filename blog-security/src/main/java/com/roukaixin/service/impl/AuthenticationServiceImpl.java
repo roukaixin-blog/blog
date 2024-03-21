@@ -4,9 +4,11 @@ import com.alibaba.fastjson2.JSON;
 import com.roukaixin.authorization.resolver.CustomizeOAuth2AuthorizationRequestResolver;
 import com.roukaixin.authorization.service.impl.JdbcClientRegistrationRepository;
 import com.roukaixin.pojo.R;
+import com.roukaixin.pojo.User;
 import com.roukaixin.pojo.dto.UserDTO;
 import com.roukaixin.pojo.vo.LoginSuccessVO;
 import com.roukaixin.service.AuthenticationService;
+import com.roukaixin.utils.AesUtils;
 import com.roukaixin.utils.JsonUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,6 +40,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -69,8 +72,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         Authentication authenticate = authenticationManager.authenticate(token);
-
-        return R.success("登录成功", null);
+        // 认证成功，生产 token 并保存到 redis
+        // getPrincipal: 用户主体信息
+        User loginUser = (User) authenticate.getPrincipal();
+        log.info("用户信息{}", loginUser);
+        redisTemplate.opsForValue().set("login:user:info", loginUser);
+        long issuedAt = System.currentTimeMillis();
+        String accessToken = AesUtils.encrypt("jdb9H6spaVAoTfwiwDiSCw==".getBytes(StandardCharsets.UTF_8)
+                , "system:" + loginUser.getId() + ":" + issuedAt);
+        long expiresAt = issuedAt + 30 * 60 * 1000;
+        String refreshToken = AesUtils.encrypt("jdb9H6spaVAoTfwiwDiSCw==".getBytes(StandardCharsets.UTF_8)
+                , "system:" + loginUser.getId() + ":" + expiresAt);
+        LoginSuccessVO vo = LoginSuccessVO
+                .builder()
+                .tokenType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .issuedAt(issuedAt)
+                .expiresAt(expiresAt)
+                .build();
+        return R.success("登录成功", vo);
     }
 
     @Override

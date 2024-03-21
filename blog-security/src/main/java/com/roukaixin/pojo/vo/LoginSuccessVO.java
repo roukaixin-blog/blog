@@ -1,8 +1,6 @@
 package com.roukaixin.pojo.vo;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * 登录成功返回 token 信息
@@ -13,6 +11,9 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoginSuccessVO {
 
     /**

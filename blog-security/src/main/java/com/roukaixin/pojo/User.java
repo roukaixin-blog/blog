@@ -29,6 +29,7 @@ public class User implements UserDetails {
     /**
      * 主键
      */
+    @Getter
     @TableId
     private Long id;
 
