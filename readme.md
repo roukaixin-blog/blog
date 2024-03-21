@@ -83,3 +83,9 @@ create table user_info_endpoint
 )
     comment '用户信息端点';
 ````
+
+> 登陆请求地址
+
+```shell
+http://127.0.0.1:10000/authentication/oauth2/authorization/github
+```
