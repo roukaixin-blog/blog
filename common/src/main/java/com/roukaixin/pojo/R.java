@@ -1,5 +1,6 @@
 package com.roukaixin.pojo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,13 @@ public class R<T> {
     /**
      * 状态码
      */
+    @Schema(description = "状态码")
     private Integer code;
 
     /**
      * 提示信息
      */
+    @Schema(description = "信息")
     private String message;
 
     /**

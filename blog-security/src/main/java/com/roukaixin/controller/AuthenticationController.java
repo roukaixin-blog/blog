@@ -5,6 +5,8 @@ import com.roukaixin.pojo.R;
 import com.roukaixin.pojo.dto.UserDTO;
 import com.roukaixin.pojo.vo.LoginSuccessVO;
 import com.roukaixin.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/authentication")
+@Tag(name = "认证管理模块")
 public class AuthenticationController {
 
 
@@ -31,6 +34,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @NoPermitLogin
+    @Operation(summary = "表单登陆")
     public R<LoginSuccessVO> login(@RequestBody UserDTO user) {
         return authenticationService.login(user);
     }

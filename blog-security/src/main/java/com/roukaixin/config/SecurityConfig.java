@@ -18,6 +18,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -103,9 +104,16 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.TRACE,
                                                 noPermitLogins.get(HttpMethod.TRACE)
                                                         .toArray(new String[]{})).permitAll()
+                                        .requestMatchers("/v3/api-docs/swagger-config", "/v3/api-docs/default").permitAll()
                                         .anyRequest().authenticated()
                         )
                         .build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return webSecurity -> webSecurity.ignoring()
+                .requestMatchers("/webjars/**", "/favicon.ico", "/doc.html");
     }
 
     /**
