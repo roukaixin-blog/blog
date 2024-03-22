@@ -35,6 +35,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+
+import static com.roukaixin.constant.SwaggerConstant.*;
 
 /**
  * 自定义 security 配置
@@ -104,7 +107,6 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.TRACE,
                                                 noPermitLogins.get(HttpMethod.TRACE)
                                                         .toArray(new String[]{})).permitAll()
-                                        .requestMatchers("/v3/api-docs/swagger-config", "/v3/api-docs/default").permitAll()
                                         .anyRequest().authenticated()
                         )
                         .build();
@@ -112,8 +114,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return webSecurity -> webSecurity.ignoring()
-                .requestMatchers("/webjars/**", "/favicon.ico", "/doc.html");
+        return web -> {};
     }
 
     /**
@@ -141,7 +142,22 @@ public class SecurityConfig {
                 addMethodMappingUrl(methodNoPermitLogin, key);
             }
         }
+        methodNoPermitLogin.putAll(HttpMethod.GET, getSwaggerPermit());
         return methodNoPermitLogin;
+    }
+
+    /**
+     * 获取文档放行的接口和静态资源
+     * @return Set<String>
+     */
+    private Set<String> getSwaggerPermit() {
+        Set<String> set = new TreeSet<>();
+        set.add(WEBJARS);
+        set.add(SWAGGER_CONFIG);
+        set.add(API_DOCS_DEFAULT);
+        set.add(FAVICON_ICO);
+        set.add(DOC_HTML);
+        return set;
     }
 
     /**
