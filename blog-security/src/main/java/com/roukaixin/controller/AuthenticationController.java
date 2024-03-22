@@ -6,6 +6,8 @@ import com.roukaixin.pojo.dto.UserDTO;
 import com.roukaixin.pojo.vo.LoginSuccessVO;
 import com.roukaixin.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,6 +43,11 @@ public class AuthenticationController {
 
     @GetMapping("/oauth2/authorization/{registrationId}")
     @NoPermitLogin
+    @Operation(summary = "OAuth2 请求认证重定向")
+    @Parameters({
+            @Parameter(name = "registrationId", description = "客户端标识", required = true, example = "github"),
+            @Parameter(name = "redirect", description = "OAuth2 登录成功后重定向地址", example = "https://127.0.0.1:10000")
+    })
     public void oauth2RequestRedirect(@PathVariable("registrationId") String registrationId,
                                       @RequestParam(value = "redirect", required = false) String redirect,
                                       HttpServletRequest request,
@@ -50,6 +57,8 @@ public class AuthenticationController {
 
     @GetMapping("/login/oauth2/code/{registrationId}")
     @NoPermitLogin
+    @Operation(summary = "OAuth2 确认授权之后回调地址")
+    @Parameter(name = "registrationId", description = "客户端标识", example = "github", required = true)
     public void loginOauth2Code(@PathVariable String registrationId,
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
