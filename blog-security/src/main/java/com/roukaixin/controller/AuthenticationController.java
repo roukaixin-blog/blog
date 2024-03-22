@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -37,7 +38,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     @NoPermitLogin
     @Operation(summary = "表单登陆")
-    public R<LoginSuccessVO> login(@RequestBody UserDTO user) {
+    public R<LoginSuccessVO> login(@RequestBody @Validated UserDTO user) {
         return authenticationService.login(user);
     }
 
