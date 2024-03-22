@@ -31,10 +31,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <!-- spring cloud 版本管理 -->
-        <spring-cloud.version>2022.0.1</spring-cloud.version>
+        <spring-cloud.version>2023.0.0</spring-cloud.version>
         <!-- spring cloud alibaba 版本管理 -->
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
-
         <!-- mybatis plus 版本管理 -->
         <mybatis-plus-spring-boot3.version>3.5.5</mybatis-plus-spring-boot3.version>
         <!-- mybatis 版本管理 -->
