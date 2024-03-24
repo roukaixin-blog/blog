@@ -1,6 +1,7 @@
 package com.roukaixin.handler;
 
 import com.roukaixin.exception.JsonException;
+import com.roukaixin.exception.LimitException;
 import com.roukaixin.pojo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,12 @@ public class GlobalExceptionHandler {
     public R<String> jsonException(JsonException jsonException){
         log.error("", jsonException);
         return R.error(jsonException.getMessage());
+    }
+
+    @ExceptionHandler(LimitException.class)
+    public R<String> limitException(LimitException limitException) {
+        log.error("接口发生限流", limitException);
+        return R.error(limitException.getMessage());
     }
 
 
