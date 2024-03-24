@@ -2,6 +2,8 @@ server:
   port: 10000
 
 spring:
+  profiles:
+    active: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
