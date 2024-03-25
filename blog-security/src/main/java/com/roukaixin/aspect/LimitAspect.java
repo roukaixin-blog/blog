@@ -2,6 +2,8 @@ package com.roukaixin.aspect;
 
 import com.roukaixin.annotation.Limit;
 import com.roukaixin.exception.LimitException;
+import com.roukaixin.utils.IpUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,9 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
+
+import static com.roukaixin.constant.RedisConstant.COLON;
+import static com.roukaixin.constant.RedisConstant.LIMIT;
 
 /**
  * 限流切面
@@ -51,7 +58,7 @@ public class LimitAspect {
         zSet.add(key, millis, millis);
         // 设置过期时间，防止浪费内存
         redisTemplate.expire(key, time, TimeUnit.SECONDS);
-        // 移除 {time} 秒之前的访问记录（滑动窗口思想）
+        // 移除 {time} 秒之前的访问记录（滑动窗口思想）, 根据 score 范围删除
         zSet.removeRangeByScore(key, 0, millis - time * 1000);
 
         // 获取 key 中的条数
@@ -63,7 +70,13 @@ public class LimitAspect {
     }
 
     private String getZSetKey(JoinPoint joinPoint) {
-        StringBuilder key = new StringBuilder("limit:");
+        StringBuilder key = new StringBuilder(LIMIT);
+        // 获取 request
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes();
+        assert requestAttributes != null;
+        HttpServletRequest request = requestAttributes.getRequest();
+        String ip = IpUtils.getIp(request);
         // 获取方法签名
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         // 方法对象
@@ -74,6 +87,6 @@ public class LimitAspect {
         String className = declaringClass.getName();
         // 方法名
         String methodName = method.getName();
-        return key.append(className).append(":").append(methodName).append("ip").append(":").toString();
+        return key.append(className).append(COLON).append(methodName).append(COLON).append(ip).append(COLON).toString();
     }
 }

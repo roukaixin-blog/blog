@@ -46,6 +46,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.roukaixin.constant.LoginConstant.*;
+import static com.roukaixin.constant.RedisConstant.COLON;
 
 /**
  * 认证管理器
