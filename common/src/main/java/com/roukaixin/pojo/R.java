@@ -50,6 +50,10 @@ public class R<T> {
         return new R<>(code, message, data);
     }
 
+    public static <T> R<T> error(Integer code, String message){
+        return error(code, message, null);
+    }
+
     public static <T> R<T> error(String message, T data){
         return error(500, message, data);
     }

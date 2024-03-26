@@ -7,6 +7,7 @@ import com.roukaixin.annotation.NoPermitLogin;
 import com.roukaixin.authorization.service.impl.OAuth2UserServiceImpl;
 import com.roukaixin.authorization.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
 import com.roukaixin.authorization.service.impl.UsernamePasswordUserDetailsServiceImpl;
+import com.roukaixin.handler.NotAuthenticationHandler;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -109,6 +110,9 @@ public class SecurityConfig {
                                                         .toArray(new String[]{})).permitAll()
                                         .anyRequest().authenticated()
                         )
+                        .exceptionHandling(exception -> {
+                            exception.authenticationEntryPoint(new NotAuthenticationHandler());
+                        })
                         .build();
     }
 
