@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 请求保护接口时，未认证处理器
@@ -25,7 +26,7 @@ public class NotAuthenticationHandler implements AuthenticationEntryPoint {
         log.error("未认证处理器", authException);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.getWriter()
                 .write(JsonUtils.toJsonString(R.error(HttpStatus.UNAUTHORIZED.value(), "未登录，请先登录")));
     }
