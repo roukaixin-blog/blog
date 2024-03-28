@@ -148,14 +148,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .authorizationRequestUri(authorizationRequest.getAuthorizationRequestUri())
                 .attributes(authorizationRequest.getAttributes());
         ClientRegistration clientRegistration = jdbcClientRegistrationRepository.findByRegistrationId(registrationId);
+        // 格式化 redirectUri 并校验是否是 uri 请求
         String redirectUri = UriComponentsBuilder.fromHttpUrl(UrlUtils.buildFullRequestUrl(request))
                 .replaceQuery(null)
                 .build()
                 .toUriString();
         OAuth2AuthorizationResponse authorizationResponse = convert(params, redirectUri);
-        // 调用认证管理器
+        // 构建未认证 Authentication。
         OAuth2LoginAuthenticationToken authenticationRequest = new OAuth2LoginAuthenticationToken(clientRegistration,
                 new OAuth2AuthorizationExchange(builder.build(), authorizationResponse));
+        // 调用认证管理器进行认证，返回经过认证的 Authentication。
         OAuth2LoginAuthenticationToken authenticationResult = (OAuth2LoginAuthenticationToken) authenticationManager
                 .authenticate(authenticationRequest);
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(authenticationResult);
