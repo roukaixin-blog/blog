@@ -1,5 +1,6 @@
 package com.roukaixin.pojo;
 
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -22,11 +23,8 @@ public class OAuth2User implements org.springframework.security.oauth2.core.user
 
     private Map<String, Object> attributes;
 
+    @Getter
     private String nameAttributeKey;
-
-    public OAuth2User() {
-
-    }
 
     public OAuth2User(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes,
                       String nameAttributeKey) {
@@ -40,11 +38,12 @@ public class OAuth2User implements org.springframework.security.oauth2.core.user
                 : Collections.unmodifiableSet(new LinkedHashSet<>(AuthorityUtils.NO_AUTHORITIES));
         this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(attributes));
         this.nameAttributeKey = nameAttributeKey;
+        this.setName(attributes.get(nameAttributeKey).toString());
     }
 
     @Override
     public String getName() {
-        return Objects.requireNonNull(this.getAttribute(this.nameAttributeKey)).toString();
+        return this.name;
     }
 
     @Override
