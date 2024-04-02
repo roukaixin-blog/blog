@@ -16,6 +16,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public interface AuthenticationService {
 
     /**
+     * 登陆
+     * @param user 账号/密码
+     * @return R
+     */
+    R<LoginSuccessVO> login(UserDTO user);
+
+    /**
      * 跳转到第三方登陆页面
      *
      * @param registrationId 客户端id
@@ -32,12 +39,5 @@ public interface AuthenticationService {
      * @param response 响应
      */
     void loginOauth2Code(String registrationId, HttpServletRequest request, HttpServletResponse response);
-
-    /**
-     * 登陆
-     * @param user 账号/密码
-     * @return R
-     */
-    R<LoginSuccessVO> login(UserDTO user);
 
 }

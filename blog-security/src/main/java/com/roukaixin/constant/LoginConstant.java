@@ -18,9 +18,11 @@ public class LoginConstant {
 
     public final static String SYSTEM = "system:";
 
-    public final static String USER_INFO_SYSTEM = "login:user:info:system:";
+    public final static String USER_INFO = "login:user:info:";
 
-    public final static String USER_ACCESS_TOKEN_SYSTEM = "login:user:access_token:system:";
+    public final static String USER_ACCESS_TOKEN = "login:user:access_token:";
 
-    public final static String USER_REFRESH_TOKEN_SYSTEM = "login:user:refresh_token:system:";
+    public final static String USER_REFRESH_TOKEN = "login:user:refresh_token:";
+
+    public final static String STATE = "state:";
 }
