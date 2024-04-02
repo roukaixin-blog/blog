@@ -35,19 +35,20 @@ create table sys_user
 ````mysql
 create table client_registration
 (
-  id                           bigint                                                                 not null comment '主键'
-    primary key,
-  registration_id              varchar(24)                                                            not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
-  client_id                    varchar(128)                                                           not null comment '客户端id',
-  client_secret                varchar(128)                                                           not null comment '客户端密码',
-  client_authentication_method varchar(32)                                                            not null comment '客户端认证方法',
-  authorization_grant_type     varchar(24)                                                            not null comment '认证授权类型',
-  redirect_uri                 varchar(255) default '{baseUrl}/{action}/oauth2/code/{registrationId}' not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
-  scope                        varchar(255)                                                           not null comment '授权范围',
-  provider_details_id          bigint                                                                 not null comment '提供商详情信息id（provider_details关联）',
-  client_name                  varchar(24)                                                            null comment '客户端名字'
+    id                           bigint                                                                 not null comment '主键'
+        primary key,
+    registration_id              varchar(24)                                                            not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
+    client_id                    varchar(128)                                                           not null comment '客户端id',
+    client_secret                varchar(128)                                                           not null comment '客户端密码',
+    client_authentication_method varchar(32)                                                            not null comment '客户端认证方法',
+    authorization_grant_type     varchar(24)                                                            not null comment '认证授权类型',
+    redirect_uri                 varchar(255) default '{baseUrl}/{action}/oauth2/code/{registrationId}' not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
+    scope                        varchar(255)                                                           not null comment '授权范围',
+    provider_details_id          bigint                                                                 not null comment '提供商详情信息id（provider_details关联）',
+    client_name                  varchar(24)                                                            null comment '客户端名字',
+    redirect                     varchar(255)                                                           not null comment '前后端分离 - 重定向的地址'
 )
-  comment '客户端注册信息';
+    comment '客户端注册信息';
 ````
 
 > ProviderDetails
