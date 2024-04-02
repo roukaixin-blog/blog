@@ -70,4 +70,9 @@ public class ClientRegistration {
      */
     private String clientName;
 
+    /**
+     *
+     */
+    private String redirect;
+
 }
