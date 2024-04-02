@@ -40,4 +40,11 @@ public interface AuthenticationService {
      */
     void loginOauth2Code(String registrationId, HttpServletRequest request, HttpServletResponse response);
 
+    /**
+     * 获取 OAuth2 令牌
+     * @param registrationId 客户端id
+     * @param state state
+     * @return R<LoginSuccessVO>
+     */
+    R<LoginSuccessVO> getOAuth2Token(String registrationId, String state);
 }

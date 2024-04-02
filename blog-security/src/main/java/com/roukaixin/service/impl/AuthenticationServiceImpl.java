@@ -31,14 +31,12 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExch
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -235,27 +233,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("oauth2 认证后的用户信息:{}", JSON.toJSONString(authenticationResult.getPrincipal()));
         OAuth2AuthorizedClient authorizedClient = getAuthorizedClient(authenticationResult);
         log.info("认证信息:{}", JSON.toJSON(authorizedClient));
-        // 颁发自己系统的 token
-        long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + EXPIRES_TIME;
-        // 访问令牌
-        String accessToken = AesUtils.encrypt(
-                AES_KEY_ACCESS_TOKEN.getBytes(StandardCharsets.UTF_8),
-                registrationId.toLowerCase() + COLON + authenticationResult.getName() +
-                        COLON + issuedAt + COLON + expiresAt);
-        // 刷新令牌
-        String refreshToken = AesUtils.encrypt(AES_KEY_REFRESH_TOKEN.getBytes(StandardCharsets.UTF_8),
-                registrationId.toLowerCase() + COLON + authenticationResult.getName() +
-                        COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
-        // 保存访问令牌和刷新令牌到 redis
-        redisTemplate.opsForValue().set(
-                USER_ACCESS_TOKEN + registrationId.toLowerCase() + COLON + authenticationResult.getName(),
-                accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
-        redisTemplate.opsForValue().set(
-                USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + authenticationResult.getName(),
-                refreshToken, EXPIRES_TIME * 60, TimeUnit.MILLISECONDS);
         // 重定向到前端页面
         try {
+            redisTemplate.opsForValue().set(
+                    registrationId.toLowerCase() + COLON + NAME + state, authenticationResult.getName());
             // 获取前端重定向 uri
             com.roukaixin.pojo.ClientRegistration selectOne = clientRegistrationMapper.selectOne(
                     Wrappers.<com.roukaixin.pojo.ClientRegistration>lambdaQuery()
@@ -355,6 +336,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private boolean isAuthorizationResponseError(MultiValueMap<String, String> params) {
         return StringUtils.hasText(params.getFirst(OAuth2ParameterNames.ERROR))
                 && StringUtils.hasText(params.getFirst(OAuth2ParameterNames.STATE));
+    }
+
+    @Override
+    public R<LoginSuccessVO> getOAuth2Token(String registrationId, String state) {
+        Object name = redisTemplate.opsForValue().get(registrationId.toLowerCase() + COLON + NAME + state);
+        if (ObjectUtils.isEmpty(name)) {
+            throw new RuntimeException("未进行登录，无法获取 oauth2 令牌");
+        }
+        OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
+                USER_INFO + registrationId.toLowerCase() + COLON + name);
+        if (oAuth2User == null) {
+            throw new RuntimeException("当前用户未登录");
+        }
+        // 颁发自己系统的 token
+        long issuedAt = System.currentTimeMillis();
+        long expiresAt = issuedAt + EXPIRES_TIME;
+        // 访问令牌
+        String accessToken = AesUtils.encrypt(
+                AES_KEY_ACCESS_TOKEN.getBytes(StandardCharsets.UTF_8),
+                registrationId.toLowerCase() + COLON + oAuth2User.getName() +
+                        COLON + issuedAt + COLON + expiresAt);
+        // 刷新令牌
+        String refreshToken = AesUtils.encrypt(AES_KEY_REFRESH_TOKEN.getBytes(StandardCharsets.UTF_8),
+                registrationId.toLowerCase() + COLON + oAuth2User.getName() +
+                        COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
+        // 保存访问令牌和刷新令牌到 redis
+        redisTemplate.opsForValue().set(
+                USER_ACCESS_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
+                accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(
+                USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
+                refreshToken, EXPIRES_TIME * 60, TimeUnit.MILLISECONDS);
+        LoginSuccessVO vo = LoginSuccessVO
+                .builder()
+                .tokenType(TOKEN_TYPE)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .issuedAt(issuedAt)
+                .expiresAt(expiresAt)
+                .build();
+        return R.success("登录成功", vo);
     }
 
 }

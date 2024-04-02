@@ -25,4 +25,6 @@ public class LoginConstant {
     public final static String USER_REFRESH_TOKEN = "login:user:refresh_token:";
 
     public final static String STATE = "state:";
+
+    public final static String NAME = "name:";
 }

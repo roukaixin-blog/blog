@@ -8,6 +8,7 @@ import com.roukaixin.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -64,6 +65,19 @@ public class AuthenticationController {
                                 HttpServletRequest request,
                                 HttpServletResponse response) {
         authenticationService.loginOauth2Code(registrationId, request, response);
+    }
+
+    @PostMapping("/get-oauth2-token/{registrationId}")
+    @NoPermitLogin
+    @Operation(summary = "获取 OAuth2 令牌")
+    @Parameters({
+            @Parameter(
+                    name = "registrationId", description = "客户端标识", example = "github",
+                    required = true, in = ParameterIn.PATH ),
+            @Parameter(name = "state", description = "表示当前唯一请求", required = true)
+    })
+    public R<LoginSuccessVO> getOAuth2Token(@PathVariable String registrationId, String state) {
+        return authenticationService.getOAuth2Token(registrationId, state);
     }
 
 }
