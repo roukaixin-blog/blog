@@ -40,7 +40,6 @@ import org.springframework.util.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -83,10 +82,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         redisTemplate.opsForValue().set(USER_INFO + SYSTEM+ loginUser.getId(), loginUser);
         long issuedAt = System.currentTimeMillis();
         long expiresAt = issuedAt + EXPIRES_TIME;
-        String accessToken = AesUtils.encrypt(AES_KEY_ACCESS_TOKEN.getBytes(StandardCharsets.UTF_8)
-                , SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
-        String refreshToken = AesUtils.encrypt(AES_KEY_REFRESH_TOKEN.getBytes(StandardCharsets.UTF_8)
-                , SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
+        String accessToken = AesUtils.encrypt(
+                AES_KEY_ACCESS_TOKEN,
+                SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
+        String refreshToken = AesUtils.encrypt(
+                AES_KEY_REFRESH_TOKEN,
+                SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
         redisTemplate.opsForValue().set(USER_ACCESS_TOKEN + SYSTEM + loginUser.getId(),
                 accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
         redisTemplate.opsForValue().set(USER_REFRESH_TOKEN + SYSTEM + loginUser.getId(),
@@ -168,9 +169,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .build();
         // 保存到 redis 中，key：state
         redisTemplate.opsForValue().set(
-                registrationId + COLON + STATE + authorizationRequest.getState(),
+                registrationId.toLowerCase() + COLON + STATE + authorizationRequest.getState(),
                 build,
-                5,
+                3,
                 TimeUnit.MINUTES);
     }
 
@@ -346,10 +347,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public R<LoginSuccessVO> getOAuth2Token(String registrationId, String state) {
+    public R<LoginSuccessVO> oAuth2Token(String registrationId, String state) {
         Object name = redisTemplate.opsForValue().get(registrationId.toLowerCase() + COLON + NAME + state);
         if (ObjectUtils.isEmpty(name)) {
-            throw new RuntimeException("未进行登录，无法获取 oauth2 令牌");
+            throw new RuntimeException("未进行 oauth2 登录，无法获取 oauth2 令牌");
         }
         OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
                 USER_INFO + registrationId.toLowerCase() + COLON + name);
@@ -361,11 +362,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         long expiresAt = issuedAt + EXPIRES_TIME;
         // 访问令牌
         String accessToken = AesUtils.encrypt(
-                AES_KEY_ACCESS_TOKEN.getBytes(StandardCharsets.UTF_8),
+                AES_KEY_ACCESS_TOKEN,
                 registrationId.toLowerCase() + COLON + oAuth2User.getName() +
                         COLON + issuedAt + COLON + expiresAt);
         // 刷新令牌
-        String refreshToken = AesUtils.encrypt(AES_KEY_REFRESH_TOKEN.getBytes(StandardCharsets.UTF_8),
+        String refreshToken = AesUtils.encrypt(
+                AES_KEY_REFRESH_TOKEN,
                 registrationId.toLowerCase() + COLON + oAuth2User.getName() +
                         COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
         // 保存访问令牌和刷新令牌到 redis

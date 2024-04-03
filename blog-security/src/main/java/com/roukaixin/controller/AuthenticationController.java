@@ -67,7 +67,7 @@ public class AuthenticationController {
         authenticationService.loginOauth2Code(registrationId, request, response);
     }
 
-    @PostMapping("/get-oauth2-token/{registrationId}")
+    @PostMapping("/oauth2/token/{registrationId}")
     @NoPermitLogin
     @Operation(summary = "获取 OAuth2 令牌")
     @Parameters({
@@ -76,8 +76,8 @@ public class AuthenticationController {
                     required = true, in = ParameterIn.PATH ),
             @Parameter(name = "state", description = "表示当前唯一请求", required = true)
     })
-    public R<LoginSuccessVO> getOAuth2Token(@PathVariable String registrationId, String state) {
-        return authenticationService.getOAuth2Token(registrationId, state);
+    public R<LoginSuccessVO> oAuth2Token(@PathVariable String registrationId, String state) {
+        return authenticationService.oAuth2Token(registrationId, state);
     }
 
 }

@@ -46,5 +46,5 @@ public interface AuthenticationService {
      * @param state state
      * @return R<LoginSuccessVO>
      */
-    R<LoginSuccessVO> getOAuth2Token(String registrationId, String state);
+    R<LoginSuccessVO> oAuth2Token(String registrationId, String state);
 }
