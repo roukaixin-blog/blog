@@ -103,20 +103,12 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
             }
             errorDetails.append("]");
             oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
-                    "An error occurred while attempting to retrieve the UserInfo Resource: " + errorDetails.toString(),
+                    "An error occurred while attempting to retrieve the UserInfo Resource: " + errorDetails,
                     null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
         }
         catch (UnknownContentTypeException ex) {
-            String errorMessage = "An error occurred while attempting to retrieve the UserInfo Resource from '"
-                    + userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri()
-                    + "': response contains invalid content type '" + ex.getContentType().toString() + "'. "
-                    + "The UserInfo Response should return a JSON object (content type 'application/json') "
-                    + "that contains a collection of name and value pairs of the claims about the authenticated End-User. "
-                    + "Please ensure the UserInfo Uri in UserInfoEndpoint for Client Registration '"
-                    + userRequest.getClientRegistration().getRegistrationId() + "' conforms to the UserInfo Endpoint, "
-                    + "as defined in OpenID Connect 1.0: 'https://openid.net/specs/openid-connect-core-1_0.html#UserInfo'";
-            OAuth2Error oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE, errorMessage, null);
+            OAuth2Error oauth2Error = getoAuth2Error(userRequest, ex);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
         }
         catch (RestClientException ex) {
@@ -126,33 +118,15 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
         }
     }
 
-    /**
-     * Sets the {@link Converter} used for converting the {@link OAuth2UserRequest} to a
-     * {@link RequestEntity} representation of the UserInfo Request.
-     * @param requestEntityConverter the {@link Converter} used for converting to a
-     * {@link RequestEntity} representation of the UserInfo Request
-     * @since 5.1
-     */
-    public final void setRequestEntityConverter(Converter<OAuth2UserRequest, RequestEntity<?>> requestEntityConverter) {
-        Assert.notNull(requestEntityConverter, "requestEntityConverter cannot be null");
-        this.requestEntityConverter = requestEntityConverter;
-    }
-
-    /**
-     * Sets the {@link RestOperations} used when requesting the UserInfo resource.
-     *
-     * <p>
-     * <b>NOTE:</b> At a minimum, the supplied {@code restOperations} must be configured
-     * with the following:
-     * <ol>
-     * <li>{@link ResponseErrorHandler} - {@link OAuth2ErrorResponseErrorHandler}</li>
-     * </ol>
-     * @param restOperations the {@link RestOperations} used when requesting the UserInfo
-     * resource
-     * @since 5.1
-     */
-    public final void setRestOperations(RestOperations restOperations) {
-        Assert.notNull(restOperations, "restOperations cannot be null");
-        this.restOperations = restOperations;
+    private static OAuth2Error getoAuth2Error(OAuth2UserRequest userRequest, UnknownContentTypeException ex) {
+        String errorMessage = "An error occurred while attempting to retrieve the UserInfo Resource from '"
+                + userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri()
+                + "': response contains invalid content type '" + ex.getContentType() + "'. "
+                + "The UserInfo Response should return a JSON object (content type 'application/json') "
+                + "that contains a collection of name and value pairs of the claims about the authenticated End-User. "
+                + "Please ensure the UserInfo Uri in UserInfoEndpoint for Client Registration '"
+                + userRequest.getClientRegistration().getRegistrationId() + "' conforms to the UserInfo Endpoint, "
+                + "as defined in OpenID Connect 1.0: 'https://openid.net/specs/openid-connect-core-1_0.html#UserInfo'";
+        return new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE, errorMessage, null);
     }
 }
