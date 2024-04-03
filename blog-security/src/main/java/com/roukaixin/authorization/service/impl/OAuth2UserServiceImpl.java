@@ -1,12 +1,12 @@
 package com.roukaixin.authorization.service.impl;
 
+import com.roukaixin.authorization.authority.SimpleGrantedAuthority;
 import com.roukaixin.authorization.user.OAuth2UserAuthority;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEntityConverter;
@@ -40,12 +40,13 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
 
     private static final String INVALID_USER_INFO_RESPONSE_ERROR_CODE = "invalid_user_info_response";
 
-    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<Map<String, Object>>() {
-    };
+    private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE =
+            new ParameterizedTypeReference<>() { };
 
-    private Converter<OAuth2UserRequest, RequestEntity<?>> requestEntityConverter = new OAuth2UserRequestEntityConverter();
+    private final Converter<OAuth2UserRequest, RequestEntity<?>>
+            requestEntityConverter = new OAuth2UserRequestEntityConverter();
 
-    private RestOperations restOperations;
+    private final RestOperations restOperations;
 
     public OAuth2UserServiceImpl() {
         RestTemplate restTemplate = new RestTemplate();
