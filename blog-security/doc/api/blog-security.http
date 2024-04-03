@@ -1,0 +1,33 @@
+# @name = "账号密码登录"
+# @no-log
+POST {{baseUrl}}/authentication/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+> {% client.global.set("access_token", response.body.data.accessToken); %}
+
+###
+
+
+@registrationId = github
+@state = variable value
+# @name = "获取 oauth2 登录之后的系统令牌"
+# @no-log
+POST /authentication/oauth2/token/{{registrationId}}
+Content-Type: application/x-www-form-urlencoded
+
+state = {{state}}
+
+> {% client.global.set("access_token", response.body.data.accessToken); %}
+
+
+###
+
+# @no-log
+# @name = "用户信息"
+GET {{baseUrl}}/user/userinfo
+Authorization: Bearer {{access_token}}
