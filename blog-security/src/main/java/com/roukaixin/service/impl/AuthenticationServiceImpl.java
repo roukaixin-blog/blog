@@ -194,12 +194,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest authorizationRequest =
                 (com.roukaixin.authorization.endpoint.OAuth2AuthorizationRequest) redisTemplate.opsForValue()
                         .get(
-                                registrationId + COLON + STATE + state
+                                registrationId.toLowerCase() + COLON + STATE + state
                         );
         if (authorizationRequest == null) {
+            // 获取不到 redis 的 AuthorizationRequest
             OAuth2Error oauth2Error = new OAuth2Error("authorization_request_not_found");
             throw new RuntimeException(oauth2Error.toString());
         }
+        // 可以获取到 AuthorizationRequest，所以把 redis 中 AuthorizationRequest 的删除掉，表示一个 state 只能用一次
+        redisTemplate.delete(registrationId.toLowerCase() + COLON + STATE + state);
         // 构建 OAuth2AuthorizationExchange 中的 OAuth2AuthorizationRequest 信息
         OAuth2AuthorizationRequest.Builder oAuth2AuthorizationRequestBuilder = OAuth2AuthorizationRequest.authorizationCode()
                 .authorizationUri(authorizationRequest.getAuthorizationUri())
@@ -236,7 +239,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 重定向到前端页面
         try {
             redisTemplate.opsForValue().set(
-                    registrationId.toLowerCase() + COLON + NAME + state, authenticationResult.getName());
+                    registrationId.toLowerCase() + COLON + NAME + state,
+                    authenticationResult.getName(),
+                    3,
+                    TimeUnit.MINUTES
+            );
             // 获取前端重定向 uri
             com.roukaixin.pojo.ClientRegistration selectOne = clientRegistrationMapper.selectOne(
                     Wrappers.<com.roukaixin.pojo.ClientRegistration>lambdaQuery()
@@ -376,6 +383,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .issuedAt(issuedAt)
                 .expiresAt(expiresAt)
                 .build();
+        // 获取成功后删除 state
+        redisTemplate.delete(registrationId.toLowerCase() + COLON + NAME + state);
         return R.success("登录成功", vo);
     }
 
