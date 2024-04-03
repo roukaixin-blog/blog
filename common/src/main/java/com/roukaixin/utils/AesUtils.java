@@ -63,9 +63,10 @@ public class AesUtils {
      * @param data 内容
      * @return byte[]
      */
-    public static String encrypt(byte[] key, String data) {
+    public static String encrypt(String key, String data) {
         try {
-            byte[] encrypt = getCipher(key, Cipher.ENCRYPT_MODE).doFinal(data.getBytes(StandardCharsets.UTF_8));
+            byte[] encrypt = getCipher(Base64.getDecoder().decode(key), Cipher.ENCRYPT_MODE)
+                    .doFinal(data.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encrypt);
         } catch (Exception e) {
             log.error("加密失败", e);
@@ -78,14 +79,15 @@ public class AesUtils {
      * 解密
      * @param key 密钥
      * @param data 密文
-     * @return byte[]
+     * @return String
      */
-    public static byte[] decrypt(byte[] key, String data) {
+    public static String decrypt(String key, String data) {
         try {
-            return getCipher(key, Cipher.DECRYPT_MODE).doFinal(data.getBytes(StandardCharsets.UTF_8));
+            return new String(getCipher(Base64.getDecoder().decode(key), Cipher.DECRYPT_MODE)
+                    .doFinal(Base64.getDecoder().decode(data)));
         } catch (Exception e) {
-            log.error("加密失败", e);
-            throw new RuntimeException("AES 加密失败");
+            log.error("解密失败", e);
+            throw new RuntimeException("AES 解密失败");
         }
     }
 
