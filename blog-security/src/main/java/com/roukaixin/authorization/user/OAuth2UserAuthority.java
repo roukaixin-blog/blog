@@ -2,6 +2,7 @@ package com.roukaixin.authorization.user;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.Assert;
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 @Setter
 @EqualsAndHashCode
+@NoArgsConstructor
 public class OAuth2UserAuthority implements GrantedAuthority {
 
     private String authority;

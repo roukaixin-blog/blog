@@ -1,6 +1,7 @@
 package com.roukaixin.pojo;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -15,6 +16,7 @@ import java.util.*;
  * @date 2024/4/2 下午4:57
  */
 @Setter
+@NoArgsConstructor
 public class OAuth2User implements org.springframework.security.oauth2.core.user.OAuth2User {
 
     private String name;
