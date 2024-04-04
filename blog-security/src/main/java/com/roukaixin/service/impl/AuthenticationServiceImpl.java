@@ -79,19 +79,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 认证成功，生产 token 并保存到 redis。getPrincipal: 用户主体信息
         User loginUser = (User) authenticate.getPrincipal();
         log.info("账号密码认证后的用户信息{}", loginUser);
-        redisTemplate.opsForValue().set(USER_INFO + SYSTEM+ loginUser.getId(), loginUser);
+        redisTemplate.opsForValue().set(USER_INFO + SYSTEM + COLON + loginUser.getId(), loginUser);
         long issuedAt = System.currentTimeMillis();
         long expiresAt = issuedAt + EXPIRES_TIME;
         String accessToken = AesUtils.encrypt(
                 AES_KEY_ACCESS_TOKEN,
-                SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
+                SYSTEM + COLON + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
         String refreshToken = AesUtils.encrypt(
                 AES_KEY_REFRESH_TOKEN,
-                SYSTEM + loginUser.getId() + COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
-        redisTemplate.opsForValue().set(USER_ACCESS_TOKEN + SYSTEM + loginUser.getId(),
+                SYSTEM + COLON + loginUser.getId() + COLON + issuedAt + COLON +
+                        (issuedAt + REFRESH_TOKEN_EXPIRES_TIME)
+        );
+        redisTemplate.opsForValue().set(USER_ACCESS_TOKEN + SYSTEM + COLON + loginUser.getId(),
                 accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
-        redisTemplate.opsForValue().set(USER_REFRESH_TOKEN + SYSTEM + loginUser.getId(),
-                refreshToken, EXPIRES_TIME * 60, TimeUnit.MILLISECONDS);
+        redisTemplate.opsForValue().set(USER_REFRESH_TOKEN + SYSTEM + COLON + loginUser.getId(),
+                refreshToken, REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS);
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()
                 .tokenType(TOKEN_TYPE)
@@ -363,20 +365,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 访问令牌
         String accessToken = AesUtils.encrypt(
                 AES_KEY_ACCESS_TOKEN,
-                registrationId.toLowerCase() + COLON + oAuth2User.getName() +
+                OAUTH2 + COLON + registrationId.toLowerCase() + COLON + oAuth2User.getName() +
                         COLON + issuedAt + COLON + expiresAt);
         // 刷新令牌
         String refreshToken = AesUtils.encrypt(
                 AES_KEY_REFRESH_TOKEN,
-                registrationId.toLowerCase() + COLON + oAuth2User.getName() +
-                        COLON + issuedAt + COLON + (issuedAt + EXPIRES_TIME * 60));
+                OAUTH2 + COLON + registrationId.toLowerCase() + COLON + oAuth2User.getName() +
+                        COLON + issuedAt + COLON + (issuedAt + REFRESH_TOKEN_EXPIRES_TIME));
         // 保存访问令牌和刷新令牌到 redis
         redisTemplate.opsForValue().set(
                 USER_ACCESS_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
                 accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
         redisTemplate.opsForValue().set(
                 USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
-                refreshToken, EXPIRES_TIME * 60, TimeUnit.MILLISECONDS);
+                refreshToken, REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS);
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()
                 .tokenType(TOKEN_TYPE)

@@ -16,7 +16,11 @@ public class LoginConstant {
 
     public final static long EXPIRES_TIME = 5 * 60 * 1000;
 
-    public final static String SYSTEM = "system:";
+    public final static long REFRESH_TOKEN_EXPIRES_TIME = EXPIRES_TIME * 60;
+
+    public final static String SYSTEM = "system";
+
+    public final static String OAUTH2 = "oauth2";
 
     public final static String USER_INFO = "login:user:info:";
 
