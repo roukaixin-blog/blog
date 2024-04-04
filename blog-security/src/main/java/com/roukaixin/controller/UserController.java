@@ -1,7 +1,6 @@
 package com.roukaixin.controller;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +18,7 @@ public class UserController {
 
     @GetMapping("/userinfo")
     @ResponseBody
-    public DefaultOAuth2User info(){
-        DefaultOAuth2User details = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return details;
+    public Object info(){
+        return SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
