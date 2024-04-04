@@ -72,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public R<LoginSuccessVO> login(UserDTO user) {
+    public R<LoginSuccessVO> loginUsernamePassword(UserDTO user) {
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
         Authentication authenticate = authenticationManager.authenticate(token);

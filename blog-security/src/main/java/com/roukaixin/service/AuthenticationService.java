@@ -20,7 +20,7 @@ public interface AuthenticationService {
      * @param user 账号/密码
      * @return R
      */
-    R<LoginSuccessVO> login(UserDTO user);
+    R<LoginSuccessVO> loginUsernamePassword(UserDTO user);
 
     /**
      * 跳转到第三方登陆页面

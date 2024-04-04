@@ -36,11 +36,11 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login/username/password")
     @NoPermitLogin
-    @Operation(summary = "表单登陆")
-    public R<LoginSuccessVO> login(@RequestBody @Validated UserDTO user) {
-        return authenticationService.login(user);
+    @Operation(summary = "账号密码登录")
+    public R<LoginSuccessVO> loginUsernamePassword(@RequestBody @Validated UserDTO user) {
+        return authenticationService.loginUsernamePassword(user);
     }
 
     @GetMapping("/oauth2/authorization/{registrationId}")
