@@ -64,15 +64,15 @@ public class AesUtils {
      * @return byte[]
      */
     public static String encrypt(String key, String data) {
+        String encryptData = null;
         try {
             byte[] encrypt = getCipher(Base64.getDecoder().decode(key), Cipher.ENCRYPT_MODE)
                     .doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(encrypt);
+            encryptData = Base64.getEncoder().encodeToString(encrypt);
         } catch (Exception e) {
             log.error("加密失败", e);
-            throw new RuntimeException("AES 加密失败");
         }
-
+        return encryptData;
     }
 
     /**
@@ -82,13 +82,14 @@ public class AesUtils {
      * @return String
      */
     public static String decrypt(String key, String data) {
+        String decryptData = null;
         try {
-            return new String(getCipher(Base64.getDecoder().decode(key), Cipher.DECRYPT_MODE)
+            decryptData = new String(getCipher(Base64.getDecoder().decode(key), Cipher.DECRYPT_MODE)
                     .doFinal(Base64.getDecoder().decode(data)));
         } catch (Exception e) {
             log.error("解密失败", e);
-            throw new RuntimeException("AES 解密失败");
         }
+        return decryptData;
     }
 
     private static Cipher getCipher(byte[] key, int mode)
