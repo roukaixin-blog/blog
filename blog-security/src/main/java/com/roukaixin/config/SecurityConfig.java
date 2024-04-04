@@ -4,6 +4,8 @@ package com.roukaixin.config;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.roukaixin.annotation.NoPermitLogin;
+import com.roukaixin.authorization.filter.AuthenticationFiler;
+import com.roukaixin.authorization.service.impl.JdbcClientRegistrationRepository;
 import com.roukaixin.authorization.service.impl.OAuth2UserServiceImpl;
 import com.roukaixin.authorization.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
 import com.roukaixin.authorization.service.impl.UsernamePasswordUserDetailsServiceImpl;
@@ -12,6 +14,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -27,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.method.HandlerMethod;
@@ -56,13 +60,21 @@ public class SecurityConfig {
 
     private final RequestMappingHandlerMapping requestMappingHandlerMapping;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final JdbcClientRegistrationRepository jdbcClientRegistrationRepository;
+
     @Autowired
     public SecurityConfig(List<AuthenticationProvider> authenticationProviders,
                           Map<String, PasswordEncoder> encoders,
-                          RequestMappingHandlerMapping requestMappingHandlerMapping) {
+                          RequestMappingHandlerMapping requestMappingHandlerMapping,
+                          RedisTemplate<String, Object> redisTemplate,
+                          JdbcClientRegistrationRepository jdbcClientRegistrationRepository) {
         this.authenticationProviders = authenticationProviders;
         this.encoders = encoders;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.redisTemplate = redisTemplate;
+        this.jdbcClientRegistrationRepository = jdbcClientRegistrationRepository;
     }
 
     @Resource
@@ -110,9 +122,13 @@ public class SecurityConfig {
                                                         .toArray(new String[]{})).permitAll()
                                         .anyRequest().authenticated()
                         )
-                        .exceptionHandling(exception -> {
-                            exception.authenticationEntryPoint(new NotAuthenticationHandler());
-                        })
+                        .exceptionHandling(exception ->
+                                exception.authenticationEntryPoint(new NotAuthenticationHandler())
+                        )
+                        .addFilterBefore(
+                                new AuthenticationFiler(redisTemplate, jdbcClientRegistrationRepository),
+                                AuthorizationFilter.class
+                        )
                         .build();
     }
 
