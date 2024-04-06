@@ -302,11 +302,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
      */
     private OAuth2AuthorizationResponse convert(MultiValueMap<String, String> request, String redirectUri) {
         String code = request.getFirst(OAuth2ParameterNames.CODE);
-        String errorCode = request.getFirst(OAuth2ParameterNames.ERROR);
         String state = request.getFirst(OAuth2ParameterNames.STATE);
         if (StringUtils.hasText(code)) {
             return OAuth2AuthorizationResponse.success(code).redirectUri(redirectUri).state(state).build();
         }
+        String errorCode = request.getFirst(OAuth2ParameterNames.ERROR);
         String errorDescription = request.getFirst(OAuth2ParameterNames.ERROR_DESCRIPTION);
         String errorUri = request.getFirst(OAuth2ParameterNames.ERROR_URI);
         // @formatter:off
