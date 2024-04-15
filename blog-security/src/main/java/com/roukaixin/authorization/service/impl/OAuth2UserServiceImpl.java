@@ -1,7 +1,7 @@
 package com.roukaixin.authorization.service.impl;
 
 import com.roukaixin.authorization.authority.SimpleGrantedAuthority;
-import com.roukaixin.authorization.user.OAuth2UserAuthority;
+import com.roukaixin.authorization.authority.OAuth2UserAuthority;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;

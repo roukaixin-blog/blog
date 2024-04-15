@@ -1,4 +1,4 @@
-package com.roukaixin.authorization.user;
+package com.roukaixin.authorization.authority;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,8 +22,14 @@ import java.util.Map;
 @NoArgsConstructor
 public class OAuth2UserAuthority implements GrantedAuthority {
 
+    /**
+     * 权限字符串
+     */
     private String authority;
 
+    /**
+     * oauth2 属性
+     */
     @Getter
     private Map<String, Object> attributes;
 

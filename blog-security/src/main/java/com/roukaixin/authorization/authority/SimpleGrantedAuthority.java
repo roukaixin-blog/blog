@@ -9,6 +9,11 @@ import org.springframework.util.Assert;
 /**
  * 简单授予权限。自定义来覆盖框架的 SimpleGrantedAuthority
  *
+ * <p>
+ *     账号密码登录
+ *     oauth2
+ * </p>
+ *
  * @author 不北咪
  * @date 2024/4/3 上午9:21
  */
@@ -18,7 +23,7 @@ import org.springframework.util.Assert;
 public class SimpleGrantedAuthority implements GrantedAuthority {
 
     /**
-     * 权限，框架是使用 role
+     * 权限，框架字段名是使用 role
      */
     private String authority;
 
