@@ -34,8 +34,6 @@ import java.time.Instant;
 import static com.roukaixin.constant.LoginConstant.AES_KEY_ACCESS_TOKEN;
 
 /**
- *
- *
  * @author 不北咪
  * @date 2024/4/3 下午10:32
  */
@@ -59,7 +57,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorization = request.getHeader(AUTHORIZATION);
-        log.info("响应状态:{}, 过滤器:{}", response.getStatus(),  filterChain.toString());
+        log.info("[AuthenticationFiler] 响应状态:{}, 过滤器:{}", response.getStatus(), filterChain.toString());
         long currentTime = System.currentTimeMillis();
         if (StringUtils.hasText(authorization)) {
             String[] authorizationSplit = authorization.split(" ");
@@ -78,7 +76,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
                         setAuthenticationToken(loginType, tokenSplit, accessToken, request, response, filterChain);
                     } else {
                         // token 过期
-                        sendResponse(441, "访问令牌过期",response);
+                        sendResponse(441, "访问令牌过期", response);
                     }
                 } else {
                     // token 无法解密，不是本系统的 token
@@ -96,14 +94,15 @@ public class AuthenticationFiler extends OncePerRequestFilter {
 
     /**
      * 设置 AuthenticationToken
-     * @param loginType 登录类型
-     * @param tokenSplit token 分割
+     *
+     * @param loginType   登录类型
+     * @param tokenSplit  token 分割
      * @param accessToken 访问令牌
-     * @param request 请求
-     * @param response 响应
+     * @param request     请求
+     * @param response    响应
      * @param filterChain 过滤器链
      * @throws ServletException 异常
-     * @throws IOException io 异常
+     * @throws IOException      io 异常
      */
     private void setAuthenticationToken(String loginType,
                                         String[] tokenSplit,
@@ -117,6 +116,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
                 User user = (User) redisTemplate.opsForValue().get(
                         LoginConstant.USER_INFO + LoginConstant.SYSTEM + RedisConstant.COLON +
                                 tokenSplit[1]);
+                logUserInfo(JsonUtils.toJsonString(user));
                 if (user != null) {
                     // 构建 UsernamePasswordAuthenticationToken
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
@@ -133,6 +133,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
             case LoginConstant.OAUTH2 -> {
                 OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
                         LoginConstant.USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]);
+                logUserInfo(JsonUtils.toJsonString(oAuth2User));
                 ClientRegistration clientRegistration = jdbcClientRegistrationRepository
                         .findByRegistrationId(tokenSplit[1]);
                 if (oAuth2User != null) {
@@ -180,5 +181,14 @@ public class AuthenticationFiler extends OncePerRequestFilter {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.getWriter().write(JsonUtils.toJsonString(R.error(status, message)));
         response.getWriter().flush();
+    }
+
+    /**
+     * 打印用户信息
+     *
+     * @param userInfo 用户信息
+     */
+    private void logUserInfo(String userInfo) {
+        log.info("[AuthenticationFiler] 用户信息 => {}", userInfo);
     }
 }
