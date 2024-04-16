@@ -35,6 +35,8 @@ mybatis-plus:
 logging:
   level:
     com.roukaixin.mapper: debug
+  file:
+    name: "./logs/spring-security.log"
 # springdoc-openapi项目配置
 springdoc:
   swagger-ui:
