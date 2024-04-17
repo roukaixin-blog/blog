@@ -1,4 +1,4 @@
-package com.roukaixin.service;
+package com.roukaixin.security.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
