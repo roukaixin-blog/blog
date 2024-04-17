@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.roukaixin.mapper.ClientRegistrationMapper">
+<mapper namespace="com.roukaixin.security.mapper.ClientRegistrationMapper">
 
-    <resultMap id="BaseResultMap" type="com.roukaixin.pojo.ClientRegistration">
+    <resultMap id="BaseResultMap" type="com.roukaixin.security.pojo.ClientRegistration">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="registrationId" column="registration_id" jdbcType="VARCHAR"/>
             <result property="clientId" column="client_id" jdbcType="VARCHAR"/>
