@@ -20,7 +20,7 @@
     <description>blog</description>
 
     <modules>
-        <module>common</module>
+        <module>blog-common</module>
         <module>blog-security</module>
     </modules>
 

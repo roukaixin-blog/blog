@@ -56,6 +56,7 @@ public class IpUtils {
         // 如果是本地环回IP，则根据网卡取本机配置的IP
         if (IP4_127.equals(ip) || IP6_127.equals(ip)) {
             try {
+                // 获取内网 ip 地址
                 InetAddress inetAddress = InetAddress.getLocalHost();
                 return inetAddress.getHostAddress();
             } catch (UnknownHostException e) {
