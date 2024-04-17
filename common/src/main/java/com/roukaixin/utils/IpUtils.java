@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * 获取 ip 地址
@@ -40,17 +41,17 @@ public class IpUtils {
     }
 
     public static String getIp(HttpServletRequest request) {
-        // 提取header得到IP地址列表（多重代理场景），取第一个IP
-        for (String header : IP_HEADER) {
-            String ipList = request.getHeader(header);
-            if (ipList != null && !ipList.isEmpty() &&
-                    !UNKNOWN.equalsIgnoreCase(ipList)) {
-                return ipList.split(",")[0];
-            }
+
+        if (request == null) {
+            return UNKNOWN;
         }
 
-        // 没有经过代理或者SLB，直接 getRemoteAddr 方法获取IP
-        String ip = request.getRemoteAddr();
+        // 提取 header 得到IP地址列表（多重代理场景），取第一个IP。没有经过代理或者SLB，直接 getRemoteAddr 方法获取IP
+        String ip = Arrays.stream(IP_HEADER)
+                .map(request::getHeader)
+                .findFirst()
+                .orElse(request.getRemoteAddr())
+                .split(",")[0];
 
         // 如果是本地环回IP，则根据网卡取本机配置的IP
         if (IP4_127.equals(ip) || IP6_127.equals(ip)) {
@@ -58,7 +59,8 @@ public class IpUtils {
                 InetAddress inetAddress = InetAddress.getLocalHost();
                 return inetAddress.getHostAddress();
             } catch (UnknownHostException e) {
-                log.error("获取ip出错", e);
+                log.error("获取网卡本机ip出错", e);
+                return UNKNOWN;
             }
         }
         return ip;
