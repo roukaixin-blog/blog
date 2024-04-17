@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
+import java.util.Set;
 
 /**
  * 获取 ip 地址
@@ -22,7 +22,7 @@ public class IpUtils {
 
     private final static String IP6_127 = "0:0:0:0:0:0:0:1";
 
-    private static final String[] IP_HEADER = {
+    private static final Set<String> IP_HEADER = Set.of(
             "X-Forwarded-For",
             "Proxy-Client-IP",
             "WL-Proxy-Client-IP",
@@ -34,7 +34,7 @@ public class IpUtils {
             "HTTP_FORWARDED",
             "HTTP_VIA",
             "REMOTE_ADDR"
-    };
+    );
 
     private IpUtils() {
 
@@ -47,8 +47,9 @@ public class IpUtils {
         }
 
         // 提取 header 得到IP地址列表（多重代理场景），取第一个IP。没有经过代理或者SLB，直接 getRemoteAddr 方法获取IP
-        String ip = Arrays.stream(IP_HEADER)
+        String ip = IP_HEADER.stream()
                 .map(request::getHeader)
+                .filter(sourceIp -> sourceIp != null && !sourceIp.isEmpty() && !UNKNOWN.equalsIgnoreCase(sourceIp))
                 .findFirst()
                 .orElse(request.getRemoteAddr())
                 .split(",")[0];
