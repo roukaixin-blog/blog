@@ -14,9 +14,7 @@ public class SwaggerConstant {
 
     public final static String DOC_HTML = "/doc.html";
 
-    public final static String SWAGGER_CONFIG = "/v3/api-docs/swagger-config";
-
-    public final static String API_DOCS_DEFAULT = "/v3/api-docs/default";
+    public final static String API_DOCS = "/v3/api-docs/**";
 
 
 }
