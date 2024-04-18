@@ -90,3 +90,57 @@ create table user_info_endpoint
 ```shell
 http://127.0.0.1:10000/authentication/oauth2/authorization/github
 ```
+
+```mysql
+
+create table sys_role
+(
+    id          bigint                       not null comment '主键id'
+        primary key,
+    name        varchar(20)                  not null comment '角色名称',
+    code        varchar(20)                  not null comment '角色代码',
+    create_id   varchar(20)                  null comment '创建人',
+    create_time datetime                     not null comment '创建时间',
+    update_id   varchar(20)                  null comment '更新人',
+    update_time datetime                     null comment '更新时间',
+    is_deleted  tinyint unsigned default '0' not null comment '是否删除（1删除，0未删除），逻辑删除字段',
+    constraint sys_role_uk_code
+        unique (code)
+)
+    comment '角色信息表';
+
+create table sys_user_role
+(
+    id      bigint not null comment '主键id'
+        primary key,
+    user_id bigint not null comment '用户表id',
+    role_id bigint not null comment '角色表id',
+    constraint sys_user_role_uk
+        unique (user_id, role_id)
+)
+    comment '用户权限关联表';
+
+create table sys_authorities
+(
+    id         bigint                       not null comment '主键id'
+        primary key,
+    name       varchar(50)                  not null comment '权限名称',
+    authority  varchar(50)                  not null comment '权限编码',
+    is_deleted tinyint unsigned default '0' not null comment '是否删除（1删除，0未删除），逻辑删除字段',
+    constraint sys_authorities_uk_authority
+        unique (authority)
+)
+    comment '权限信息表';
+
+create table sys_role_authorities
+(
+    id             bigint not null comment '主键id'
+        primary key,
+    role_id        bigint not null comment '角色id',
+    authorities_id bigint not null comment '权限id',
+    constraint sys_role_authorities_uk
+        unique (role_id, authorities_id)
+)
+    comment '角色和权限关联表';
+
+```
