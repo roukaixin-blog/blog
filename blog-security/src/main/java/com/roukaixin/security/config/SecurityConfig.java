@@ -172,8 +172,7 @@ public class SecurityConfig {
     private Set<String> getSwaggerPermit() {
         Set<String> set = new TreeSet<>();
         set.add(SwaggerConstant.WEBJARS);
-        set.add(SwaggerConstant.SWAGGER_CONFIG);
-        set.add(SwaggerConstant.API_DOCS_DEFAULT);
+        set.add(SwaggerConstant.API_DOCS);
         set.add(SwaggerConstant.FAVICON_ICO);
         set.add(SwaggerConstant.DOC_HTML);
         return set;
@@ -185,7 +184,7 @@ public class SecurityConfig {
      * @param key 请求信息
      */
     private void addMethodMappingUrl(Multimap<HttpMethod, String> methodNoPermitLogin, RequestMappingInfo key) {
-        // 一个请求的请求方式
+        // 请求方式。例如: GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE
         Set<RequestMethod> methods = key.getMethodsCondition().getMethods();
         // 请求 url
         Set<String> patternValues;
