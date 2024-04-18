@@ -1,7 +1,10 @@
 server:
   port: 10000
 
+
 spring:
+  application:
+    name: "@project.artifactId@"
   profiles:
     active: dev
   datasource:
@@ -34,23 +37,16 @@ mybatis-plus:
       logic-not-delete-value: 0
 logging:
   level:
-    com.roukaixin.mapper: debug
+    com.roukaixin.security.mapper: debug
   file:
-    name: "./logs/spring-security.log"
+    name: "./logs/${spring.application.name}.log"
 # springdoc-openapi项目配置
 springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: method
   api-docs:
     path: /v3/api-docs
-  group-configs:
-    - group: 'default'
-      paths-to-match: '/**'
-      packages-to-scan: com.roukaixin
 # knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true
   setting:
     language: zh_cn
+    enable-group: true
