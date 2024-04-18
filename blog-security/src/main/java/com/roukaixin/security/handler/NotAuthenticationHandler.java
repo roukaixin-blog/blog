@@ -23,7 +23,7 @@ public class NotAuthenticationHandler implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
-        log.error("未认证处理器", authException);
+        log.error("[NotAuthenticationHandler] 未进行认证", authException);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

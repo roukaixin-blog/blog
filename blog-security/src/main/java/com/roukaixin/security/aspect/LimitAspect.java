@@ -85,6 +85,13 @@ public class LimitAspect {
         String className = declaringClass.getName();
         // 方法名
         String methodName = method.getName();
-        return key.append(className).append(RedisConstant.COLON).append(methodName).append(RedisConstant.COLON).append(ip).append(RedisConstant.COLON).toString();
+        return key
+                .append(className)
+                .append(RedisConstant.COLON)
+                .append(methodName)
+                .append(RedisConstant.COLON)
+                .append(ip)
+                .append(RedisConstant.COLON)
+                .toString();
     }
 }

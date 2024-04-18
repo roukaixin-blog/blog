@@ -85,8 +85,8 @@ public class AuthenticationFiler extends OncePerRequestFilter {
                     sendResponse(442, "不是有效的访问令牌，访问令牌不能解析", response);
                 }
             } else {
-                // 非法 token
-                log.error("非法 token：{}", authorization);
+                // 非法 token（伪造或者不是本系统的 token）
+                log.error("[AuthenticationFiler] 非法 token => {}", authorization);
                 sendResponse(442, "不是有效的访问令牌", response);
             }
         } else {
@@ -133,6 +133,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
             case LoginConstant.OAUTH2 -> {
+                // 从 redis 获取 oauth2 用户信息。
                 OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
                         LoginConstant.USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]);
                 logUserInfo(JsonUtils.toJsonString(oAuth2User));
@@ -177,6 +178,14 @@ public class AuthenticationFiler extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 发生响应
+     *
+     * @param status   响应状态
+     * @param message  响应消息
+     * @param response 响应请求
+     * @throws IOException 异常
+     */
     private void sendResponse(int status, String message, HttpServletResponse response) throws IOException {
         response.setStatus(status);
         response.setContentType("application/json");

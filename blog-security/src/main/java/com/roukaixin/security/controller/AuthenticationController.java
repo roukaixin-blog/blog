@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
 
-
     private final AuthenticationService authenticationService;
 
     @Autowired
@@ -59,7 +58,7 @@ public class AuthenticationController {
 
     @GetMapping("/login/oauth2/code/{registrationId}")
     @NoPermitLogin
-    @Operation(summary = "OAuth2 确认授权之后回调地址")
+    @Operation(summary = "OAuth2 确认授权之后回调地址", hidden = true)
     @Parameter(name = "registrationId", description = "客户端标识", example = "github", required = true)
     public void loginOauth2Code(@PathVariable String registrationId,
                                 HttpServletRequest request,
@@ -73,7 +72,7 @@ public class AuthenticationController {
     @Parameters({
             @Parameter(
                     name = "registrationId", description = "客户端标识", example = "github",
-                    required = true, in = ParameterIn.PATH ),
+                    required = true, in = ParameterIn.PATH),
             @Parameter(name = "state", description = "表示当前唯一请求", required = true)
     })
     public R<LoginSuccessVO> oAuth2Token(@PathVariable String registrationId, String state) {
