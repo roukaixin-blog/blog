@@ -1,14 +1,14 @@
 package com.roukaixin.security.authorization.filter;
 
 
+import com.roukaixin.common.pojo.R;
+import com.roukaixin.common.utils.AesUtils;
+import com.roukaixin.common.utils.JsonUtils;
 import com.roukaixin.security.authorization.service.impl.JdbcClientRegistrationRepository;
 import com.roukaixin.security.constant.LoginConstant;
 import com.roukaixin.security.constant.RedisConstant;
 import com.roukaixin.security.pojo.OAuth2User;
-import com.roukaixin.common.pojo.R;
 import com.roukaixin.security.pojo.User;
-import com.roukaixin.common.utils.AesUtils;
-import com.roukaixin.common.utils.JsonUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
@@ -32,6 +33,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 /**
+ * 校验 token 是否存在、合法
+ *
  * @author 不北咪
  * @date 2024/4/3 下午10:32
  */
@@ -53,9 +56,10 @@ public class AuthenticationFiler extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         String authorization = request.getHeader(AUTHORIZATION);
-        log.info("[AuthenticationFiler] 响应状态:{}, 过滤器:{}", response.getStatus(), filterChain.toString());
         long currentTime = System.currentTimeMillis();
         if (StringUtils.hasText(authorization)) {
             String[] authorizationSplit = authorization.split(" ");
