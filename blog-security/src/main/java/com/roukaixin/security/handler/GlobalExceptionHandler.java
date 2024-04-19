@@ -2,6 +2,7 @@ package com.roukaixin.security.handler;
 
 import com.roukaixin.common.exception.JsonException;
 import com.roukaixin.common.exception.LimitException;
+import com.roukaixin.common.exception.OAuth2Exception;
 import com.roukaixin.common.pojo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,12 @@ public class GlobalExceptionHandler {
     public R<String> limitException(LimitException limitException) {
         log.error("接口发生限流", limitException);
         return R.error(limitException.getMessage());
+    }
+
+    @ExceptionHandler(OAuth2Exception.class)
+    public R<String>  oAuth2Exception(OAuth2Exception oAuth2Exception) {
+        log.error("[GlobalExceptionHandler] OAuth2 异常", oAuth2Exception);
+        return R.error(oAuth2Exception.getMessage());
     }
 
 
