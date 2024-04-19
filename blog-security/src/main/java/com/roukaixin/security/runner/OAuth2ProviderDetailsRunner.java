@@ -1,17 +1,22 @@
 package com.roukaixin.security.runner;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.roukaixin.security.controller.AuthenticationController;
 import com.roukaixin.security.enums.AuthenticationMethodEnum;
 import com.roukaixin.security.pojo.ProviderDetails;
 import com.roukaixin.security.pojo.UserInfoEndpoint;
+import com.roukaixin.security.service.ClientRegistrationService;
 import com.roukaixin.security.service.ProviderDetailsService;
 import com.roukaixin.security.service.UserInfoEndpointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,21 +32,46 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class OAuth2ProviderDetailsRunner implements CommandLineRunner {
 
+    private final String BASE_URL = "{baseUrl}";
+
+    private final ClientRegistrationService clientRegistrationService;
+
     private final ProviderDetailsService providerDetailsService;
 
     private final UserInfoEndpointService userInfoEndpointService;
 
+    private final ApplicationContext applicationContext;
+
+    private final JdbcClient jdbcClient;
+
     @Autowired
-    public OAuth2ProviderDetailsRunner(ProviderDetailsService providerDetailsService,
-                                       UserInfoEndpointService userInfoEndpointService) {
+    public OAuth2ProviderDetailsRunner(ClientRegistrationService clientRegistrationService,
+                                       ProviderDetailsService providerDetailsService,
+                                       UserInfoEndpointService userInfoEndpointService,
+                                       ApplicationContext applicationContext,
+                                       JdbcClient jdbcClient) {
+        this.clientRegistrationService = clientRegistrationService;
         this.providerDetailsService = providerDetailsService;
         this.userInfoEndpointService = userInfoEndpointService;
+        this.applicationContext = applicationContext;
+        this.jdbcClient = jdbcClient;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void run(String... args) {
 
+        // 从 security 内置的 OAuth2 中获取插入到数据库中
+        insertCommonOAuth2Provider();
+
+        // 修改重定向默认值
+        updateClientRegistrationRedirectUri();
+    }
+
+    /**
+     * 从 security 内置的 OAuth2 中获取插入到数据库中
+     */
+    private void insertCommonOAuth2Provider() {
         CommonOAuth2Provider[] providers = CommonOAuth2Provider.values();
         List<String> registrationIds = Arrays.stream(providers)
                 .map(e -> e.name().toLowerCase())
@@ -119,5 +149,44 @@ public class OAuth2ProviderDetailsRunner implements CommandLineRunner {
         if (!userInfoEndpoints.isEmpty()) {
             userInfoEndpointService.removeBatchByIds(userInfoEndpoints.stream().map(UserInfoEndpoint::getId).toList());
         }
+    }
+
+    /**
+     * 更新重定向uri默认值
+     */
+    private void updateClientRegistrationRedirectUri() {
+        AuthenticationController bean = applicationContext.getBean(AuthenticationController.class);
+        String replaceRedirectUri = getRedirectUri(bean);
+        String sql = "alter table sys_client_registration alter column redirect_uri set default '" + replaceRedirectUri + "'";
+        jdbcClient.sql(sql).update();
+        List<com.roukaixin.security.pojo.ClientRegistration> list = clientRegistrationService.list(
+                Wrappers.<com.roukaixin.security.pojo.ClientRegistration>lambdaQuery()
+                        .select(
+                                com.roukaixin.security.pojo.ClientRegistration::getId,
+                                com.roukaixin.security.pojo.ClientRegistration::getRedirectUri
+                        )
+        );
+        if (!list.isEmpty()) {
+            list.forEach(e -> {
+                String redirectUri = e.getRedirectUri();
+                if (BASE_URL.equals(redirectUri.substring(0, BASE_URL.length()))) {
+                    e.setRedirectUri(replaceRedirectUri);
+                }
+            });
+            clientRegistrationService.updateBatchById(list);
+        }
+    }
+
+    private static String getRedirectUri(AuthenticationController bean) {
+        RequestMapping annotation = bean.getClass().getAnnotation(RequestMapping.class);
+        String defaultRedirectUri = "{baseUrl}{/authentication}/{action}/oauth2/code/{registrationId}";
+        String replaceRedirectUri;
+        if (annotation != null) {
+            String path = annotation.value()[0];
+            replaceRedirectUri = defaultRedirectUri.replace("{/authentication}", path);
+        } else {
+            replaceRedirectUri = defaultRedirectUri.replace("{/authentication}", "");
+        }
+        return replaceRedirectUri;
     }
 }
