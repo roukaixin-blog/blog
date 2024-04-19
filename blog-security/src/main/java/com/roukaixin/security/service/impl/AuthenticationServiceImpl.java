@@ -2,6 +2,7 @@ package com.roukaixin.security.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.roukaixin.common.exception.OAuth2Exception;
 import com.roukaixin.common.pojo.R;
 import com.roukaixin.common.utils.AesUtils;
 import com.roukaixin.common.utils.JsonUtils;
@@ -114,7 +115,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             sendRedirectForAuthorization(request, response, authorizationRequest, registrationId);
         } catch (IOException e) {
-            log.error("发送请求重定向失败", e);
+            log.error("[AuthenticationServiceImpl] 发送请求重定向失败", e);
+            throw new OAuth2Exception(e.getMessage());
         }
 
     }
@@ -154,7 +156,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                           HttpServletResponse response, String registrationId) {
         Assert.notNull(request, "request cannot be null");
         Assert.notNull(response, "response cannot be null");
-        // 保存 OAuth2AuthorizationRequest，回调之后会使用到 `OAuth2AuthorizationRequest`
+        // 保存 OAuth2AuthorizationRequest，回调之后会用到 OAuth2AuthorizationRequest
         com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest build =
                 com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest
                         .builder()
@@ -174,7 +176,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 registrationId.toLowerCase() + COLON + STATE + authorizationRequest.getState(),
                 build,
                 3,
-                TimeUnit.MINUTES);
+                TimeUnit.MINUTES
+        );
     }
 
     @Override
@@ -186,12 +189,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String state = params.getFirst(OAuth2ParameterNames.STATE);
         if (!StringUtils.hasText(state)) {
             log.info("回调地址中不包含 state，参数信息：{}", JsonUtils.toJsonString(params));
-            throw new RuntimeException("错误请求");
+            throw new OAuth2Exception("错误请求");
         }
         // 判断是否为认证响应,参数中有 code 和 state 或 state 和 error 都是授权响应
         if (!isAuthorizationResponse(params)) {
             // 不是认证响应
-            throw new RuntimeException(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST).toString());
+            throw new OAuth2Exception(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST).toString());
         }
         // 获取 OAuth2AuthorizationRequest，从 redis 中获取
         com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest authorizationRequest =
@@ -202,12 +205,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (authorizationRequest == null) {
             // 获取不到 redis 的 AuthorizationRequest
             OAuth2Error oauth2Error = new OAuth2Error("authorization_request_not_found");
-            throw new RuntimeException(oauth2Error.toString());
+            throw new OAuth2Exception(oauth2Error.toString());
         }
         // 可以获取到 AuthorizationRequest，所以把 redis 中 AuthorizationRequest 的删除掉，表示一个 state 只能用一次
         redisTemplate.delete(registrationId.toLowerCase() + COLON + STATE + state);
         // 构建 OAuth2AuthorizationExchange 中的 OAuth2AuthorizationRequest 信息
-        OAuth2AuthorizationRequest.Builder oAuth2AuthorizationRequestBuilder = OAuth2AuthorizationRequest.authorizationCode()
+        OAuth2AuthorizationRequest.Builder oAuth2AuthorizationRequestBuilder = OAuth2AuthorizationRequest
+                .authorizationCode()
                 .authorizationUri(authorizationRequest.getAuthorizationUri())
                 .clientId(authorizationRequest.getClientId())
                 .redirectUri(authorizationRequest.getRedirectUri())
@@ -256,12 +260,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     selectOne.getRedirect() + "&state=" + state + "&registrationId=" + selectOne.getRegistrationId());
         } catch (IOException e) {
             log.error("重定向到前端页面失败", e);
-            throw new RuntimeException(e);
+            throw new OAuth2Exception(e.getMessage());
         }
     }
 
     /**
      * 参数转换成 MultiValueMap
+     *
      * @param parameterMap 参数 map
      * @return MultiValueMap
      */
@@ -277,6 +282,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * 获取授权客户端
+     *
      * @param authenticationResult Authentication(认证之后的)
      * @return OAuth2AuthorizedClient
      */
@@ -296,7 +302,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * 转化 OAuth2AuthorizationResponse
-     * @param request request
+     *
+     * @param request     request
      * @param redirectUri redirectUri
      * @return OAuth2AuthorizationResponse
      */
@@ -321,6 +328,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * 是否是认证响应
+     *
      * @param params 参数
      * @return boolean
      */
@@ -330,6 +338,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * 是否认证成功响应
+     *
      * @param params 参数
      * @return boolean
      */
@@ -340,6 +349,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     /**
      * 是否认证失败响应
+     *
      * @param params 参数
      * @return boolean
      */

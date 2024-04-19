@@ -1,5 +1,6 @@
 package com.roukaixin.security.authorization.resolver;
 
+import com.roukaixin.common.exception.OAuth2Exception;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.core.oidc.endpoint.OidcParameterNames;
 import org.springframework.security.web.util.UrlUtils;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
@@ -51,8 +53,8 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
     private static final StringKeyGenerator DEFAULT_SECURE_KEY_GENERATOR = new Base64StringKeyGenerator(
             Base64.getUrlEncoder().withoutPadding(), 96);
 
-    private static final Consumer<OAuth2AuthorizationRequest.Builder> DEFAULT_PKCE_APPLIER = OAuth2AuthorizationRequestCustomizers
-            .withPkce();
+    private static final Consumer<OAuth2AuthorizationRequest.Builder> DEFAULT_PKCE_APPLIER =
+            OAuth2AuthorizationRequestCustomizers.withPkce();
 
     private final ClientRegistrationRepository clientRegistrationRepository;
 
@@ -63,23 +65,20 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
     public CustomizeOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository,
                                                        String registrationId) {
         this.clientRegistrationRepository = clientRegistrationRepository;
+        Assert.hasText(registrationId, "[CustomizeOAuth2AuthorizationRequestResolver] registrationId 不能为空");
         this.registrationId = registrationId;
     }
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
-        if (this.registrationId == null) {
-            return null;
-        }
+        // 重定向 uri 操作。例如：授权、认证
         String redirectUriAction = getAction(request, "login");
         return resolve(request, this.registrationId, redirectUriAction);
     }
 
     @Override
     public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
-        if (this.registrationId == null) {
-            return null;
-        }
+        // 重定向 uri 操作。例如：授权、认证
         String redirectUriAction = getAction(request, "authorize");
         return resolve(request, this.registrationId, redirectUriAction);
     }
@@ -94,24 +93,20 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
 
     private OAuth2AuthorizationRequest resolve(HttpServletRequest request, String registrationId,
                                                String redirectUriAction) {
-        if (registrationId == null) {
-            return null;
-        }
         ClientRegistration clientRegistration = this.clientRegistrationRepository.findByRegistrationId(registrationId);
         if (clientRegistration == null) {
-            throw new RuntimeException("Invalid Client Registration with Id: " + registrationId);
+            throw new OAuth2Exception("Invalid Client Registration with Id: " + registrationId);
         }
         OAuth2AuthorizationRequest.Builder builder = getBuilder(clientRegistration);
 
+        // 格式化重定向 uri
         String redirectUriStr = expandRedirectUri(request, clientRegistration, redirectUriAction);
 
-        // @formatter:off
         builder.clientId(clientRegistration.getClientId())
                 .authorizationUri(clientRegistration.getProviderDetails().getAuthorizationUri())
                 .redirectUri(redirectUriStr)
                 .scopes(clientRegistration.getScopes())
                 .state(DEFAULT_STATE_GENERATOR.generateKey());
-        // @formatter:on
 
         this.authorizationRequestCustomizer.accept(builder);
 
@@ -182,9 +177,8 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
             String nonceHash = createHash(nonce);
             builder.attributes((attrs) -> attrs.put(OidcParameterNames.NONCE, nonce));
             builder.additionalParameters((params) -> params.put(OidcParameterNames.NONCE, nonceHash));
-        }
-        catch (NoSuchAlgorithmException ex) {
-            log.error("",ex);
+        } catch (NoSuchAlgorithmException ex) {
+            log.error("[CustomizeOAuth2AuthorizationRequestResolver] [applyNonce]", ex);
         }
     }
 
