@@ -91,29 +91,32 @@ create table sys_role_authorities
 ```
 
 
-## oauth2
+## OAuth2 相关数据库
 
 > ClientRegistration
 
 客户端注册信息
 
 ```mysql
-create table client_registration
+create table sys_client_registration
 (
     id                           bigint                                                                 not null comment '主键'
         primary key,
-    registration_id              varchar(24)                                                            not null comment '注册端标识，唯一（一个项目只能有一个项目的id）',
+    registration_id              varchar(24)                                                            not null comment '注册端标识，唯一',
     client_id                    varchar(128)                                                           not null comment '客户端id',
-    client_secret                varchar(128)                                                           not null comment '客户端密码',
-    client_authentication_method varchar(32)                                                            not null comment '客户端认证方法',
+    client_secret                varchar(128)                                                           not null comment '客户密钥',
+    client_authentication_method varchar(32)                                                            not null comment '客户端认证方式',
     authorization_grant_type     varchar(24)                                                            not null comment '认证授权类型',
-    redirect_uri                 varchar(255) default '{baseUrl}/{action}/oauth2/code/{registrationId}' not null comment '重定向uri（重定向到服务地址(个人项目的地址)接口）',
-    scope                        varchar(255)                                                           not null comment '授权范围',
-    provider_details_id          bigint                                                                 not null comment '提供商详情信息id（provider_details关联）',
-    client_name                  varchar(24)                                                            null comment '客户端名字',
-    redirect                     varchar(255)                                                           not null comment '前后端分离 - 重定向的地址'
+    redirect_uri                 varchar(255) default '{baseUrl}/{action}/oauth2/code/{registrationId}' not null comment '重定向uri, 不能修改, 生成后需要填写到 OAuth2 应用中去',
+    scope                        varchar(255)                                                           not null comment '授权权限',
+    provider_details_id          bigint                                                                 not null comment '提供商详情信息id, 与 sys_provider_details 关联',
+    client_name                  varchar(24)                                                            null comment '客户端名字, 用于前端展示',
+    redirect                     varchar(255)                                                           not null comment '重定向的地址, 不是 OAuth2 的重定向地址'
 )
-    comment '客户端注册信息';
+    comment '客户端注册表';
+
+/* 修改重定向默认值 */
+alter table sys_client_registration alter column redirect_uri set default '{baseUrl}/{action}/oauth2/code/{registrationId}';
 ```
 
 > ProviderDetails
@@ -121,31 +124,34 @@ create table client_registration
 客户端提供的信息。例如：登录接口地址，用户信息接口等
 
 ```mysql
-create table provider_details
+create table sys_provider_details
 (
     id                     bigint        not null comment '主键'
         primary key,
-    registration_id        varchar(24)   not null comment '第三方服务商标识',
-    authorization_uri      varchar(255)  not null comment '第三方服务商(github)的登录接口',
-    token_uri              varchar(255)  not null comment '第三方服务商(github)获取token的接口',
-    user_info_endpoint_id  bigint        not null comment '用户信息端点id',
+    registration_id        varchar(24)   not null comment 'OAuth2 提供商标识。例如: github、google',
+    authorization_uri      varchar(255)  not null comment 'OAuth2 提供商认证接口',
+    token_uri              varchar(255)  not null comment 'OAuth2 提供商获取 token 接口',
+    user_info_endpoint_id  bigint        not null comment '用户信息端点id，关联 sys_user_info_endpoint 表',
     jwk_set_uri            varchar(255)  null,
     issuer_uri             varchar(255)  null,
-    configuration_metadata varchar(2000) null comment '配置源数据',
+    configuration_metadata varchar(2000) null comment '配置元数据',
     constraint registration_id_un
         unique (registration_id)
 )
-    comment 'oauth2 服务商提供的信息';
+    comment 'OAuth2 提供商详细信息';
 ```
 
 > UserInfoEndpoint
+
+用户信息端点
+
 ```mysql
-create table user_info_endpoint
+create table sys_user_info_endpoint
 (
     id                       bigint       not null comment '主键',
-    uri                      varchar(255) not null comment '获取第三方服务商用户信息接口',
-    authentication_method    varchar(32)  not null comment '认证方法。可选值：header，form，query',
-    user_name_attribute_name varchar(32)  not null comment '第三方用户名的字段'
+    uri                      varchar(255) not null comment 'OAuth2 获取用户信息接口',
+    authentication_method    varchar(32)  not null comment 'OAuth2 身份验证方式。可选值：header、form、query',
+    user_name_attribute_name varchar(16)  not null comment 'OAuth2 第三方账号唯一标识'
 )
-    comment '用户信息端点';
+    comment '用户信息端点表';
 ```

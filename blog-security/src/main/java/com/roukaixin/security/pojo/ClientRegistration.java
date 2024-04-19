@@ -16,7 +16,7 @@ import java.util.Set;
  */
 @Setter
 @Getter
-@TableName(value = "client_registration", autoResultMap = true)
+@TableName(value = "sys_client_registration", autoResultMap = true)
 public class ClientRegistration {
 
     /**
@@ -25,7 +25,7 @@ public class ClientRegistration {
     private Long id;
 
     /**
-     * 注册端标识，唯一（一个项目只能有一个项目的id）
+     * 注册端标识，唯一
      */
     private String registrationId;
 
@@ -35,12 +35,12 @@ public class ClientRegistration {
     private String clientId;
 
     /**
-     * 客户端密码
+     * 客户密钥
      */
     private String clientSecret;
 
     /**
-     * 客户端认证方法
+     * 客户端认证方式
      */
     private String clientAuthenticationMethod;
 
@@ -50,28 +50,28 @@ public class ClientRegistration {
     private String authorizationGrantType;
 
     /**
-     * 重定向uri（重定向到服务地址(个人项目的地址)接口）
+     * 重定向uri, 不能修改, 生成后需要填写到 OAuth2 应用中去
      */
     private String redirectUri;
 
     /**
-     * 授权范围
+     * 授权权限
      */
     @TableField(value = "scope", typeHandler = JacksonTypeHandler.class)
     private Set<String> scopes;
 
     /**
-     * 提供商详情信息id（provider_details关联）
+     * 提供商详情信息id, 与 sys_provider_details 关联
      */
     private Long providerDetailsId;
 
     /**
-     * 客户端名字
+     * 客户端名字, 用于前端展示
      */
     private String clientName;
 
     /**
-     *
+     * 重定向的地址, 不是 OAuth2 的重定向地址
      */
     private String redirect;
 
