@@ -397,6 +397,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         redisTemplate.opsForValue().set(
                 LOGIN_USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
                 refreshToken, REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS);
+        // 设置 OAuth2 用户过期时间
+        redisTemplate.expire(
+                LOGIN_USER_INFO + registrationId.toLowerCase() + COLON + name,
+                REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS
+        );
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()
                 .tokenType(TOKEN_TYPE)

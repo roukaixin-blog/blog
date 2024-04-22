@@ -65,6 +65,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
                             + userRequest.getClientRegistration().getRegistrationId(), null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
+        // OAuth2 用户 id 的字段名
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
@@ -76,7 +77,9 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
                     null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
+        // 转化成一个 RequestEntity
         RequestEntity<?> request = this.requestEntityConverter.convert(userRequest);
+        // 请求接口，获取响应数据。返回一个 Map<String,Object>
         ResponseEntity<Map<String, Object>> response = getResponse(userRequest, request);
         Map<String, Object> userAttributes = response.getBody();
         Set<GrantedAuthority> authorities = new LinkedHashSet<>();
@@ -95,8 +98,8 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
             OAuth2Error oauth2Error = ex.getError();
             StringBuilder errorDetails = new StringBuilder();
             errorDetails.append("Error details: [");
-            errorDetails.append("UserInfo Uri: ")
-                    .append(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri());
+            errorDetails.append("UserInfo Uri: ");
+            errorDetails.append(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri());
             errorDetails.append(", Error Code: ").append(oauth2Error.getErrorCode());
             if (oauth2Error.getDescription() != null) {
                 errorDetails.append(", Error Description: ").append(oauth2Error.getDescription());
