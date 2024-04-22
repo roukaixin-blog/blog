@@ -22,11 +22,11 @@ public class LoginConstant {
 
     public final static String OAUTH2 = "oauth2";
 
-    public final static String USER_INFO = "login:user:info:";
+    public final static String LOGIN_USER_INFO = "login:user:info:";
 
-    public final static String USER_ACCESS_TOKEN = "login:user:access_token:";
+    public final static String LOGIN_USER_ACCESS_TOKEN = "login:user:access_token:";
 
-    public final static String USER_REFRESH_TOKEN = "login:user:refresh_token:";
+    public final static String LOGIN_USER_REFRESH_TOKEN = "login:user:refresh_token:";
 
     public final static String STATE = "state:";
 

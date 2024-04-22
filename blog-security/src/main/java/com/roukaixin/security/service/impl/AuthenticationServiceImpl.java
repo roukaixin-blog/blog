@@ -6,8 +6,8 @@ import com.roukaixin.common.exception.OAuth2Exception;
 import com.roukaixin.common.pojo.R;
 import com.roukaixin.common.utils.AesUtils;
 import com.roukaixin.common.utils.JsonUtils;
-import com.roukaixin.security.authorization.resolver.CustomizeOAuth2AuthorizationRequestResolver;
-import com.roukaixin.security.authorization.service.impl.JdbcClientRegistrationRepository;
+import com.roukaixin.security.authorization.resolver.OAuth2AuthorizationRequestResolverImpl;
+import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
 import com.roukaixin.security.mapper.ClientRegistrationMapper;
 import com.roukaixin.security.pojo.User;
 import com.roukaixin.security.pojo.dto.UserDTO;
@@ -80,20 +80,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // 认证成功，生产 token 并保存到 redis。getPrincipal: 用户主体信息
         User loginUser = (User) authenticate.getPrincipal();
         log.info("账号密码认证后的用户信息{}", loginUser);
-        redisTemplate.opsForValue().set(USER_INFO + SYSTEM + COLON + loginUser.getId(), loginUser);
         long issuedAt = System.currentTimeMillis();
         long expiresAt = issuedAt + EXPIRES_TIME;
+        // 保存用户信息到 redis，并设置过期时间（和刷新 token 一样）
+        redisTemplate.opsForValue().set(
+                LOGIN_USER_INFO + SYSTEM + COLON + loginUser.getId(),
+                loginUser,
+                REFRESH_TOKEN_EXPIRES_TIME,
+                TimeUnit.MILLISECONDS
+        );
+        // 生成 accessToken（访问令牌）
         String accessToken = AesUtils.encrypt(
                 AES_KEY_ACCESS_TOKEN,
                 SYSTEM + COLON + loginUser.getId() + COLON + issuedAt + COLON + expiresAt);
+        // 生成 refreshToken（刷新令牌）
         String refreshToken = AesUtils.encrypt(
                 AES_KEY_REFRESH_TOKEN,
                 SYSTEM + COLON + loginUser.getId() + COLON + issuedAt + COLON +
                         (issuedAt + REFRESH_TOKEN_EXPIRES_TIME)
         );
-        redisTemplate.opsForValue().set(USER_ACCESS_TOKEN + SYSTEM + COLON + loginUser.getId(),
+        redisTemplate.opsForValue().set(LOGIN_USER_ACCESS_TOKEN + SYSTEM + COLON + loginUser.getId(),
                 accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
-        redisTemplate.opsForValue().set(USER_REFRESH_TOKEN + SYSTEM + COLON + loginUser.getId(),
+        redisTemplate.opsForValue().set(LOGIN_USER_REFRESH_TOKEN + SYSTEM + COLON + loginUser.getId(),
                 refreshToken, REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS);
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()
@@ -109,8 +117,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void oauth2RequestRedirect(String registrationId, String redirect,
                                       HttpServletRequest request, HttpServletResponse response) {
-        CustomizeOAuth2AuthorizationRequestResolver resolver =
-                new CustomizeOAuth2AuthorizationRequestResolver(jdbcClientRegistrationRepository, registrationId);
+        OAuth2AuthorizationRequestResolverImpl resolver =
+                new OAuth2AuthorizationRequestResolverImpl(jdbcClientRegistrationRepository, registrationId);
         OAuth2AuthorizationRequest authorizationRequest = resolver.resolve(request);
         try {
             sendRedirectForAuthorization(request, response, authorizationRequest, registrationId);
@@ -237,7 +245,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .authenticate(authenticationRequest);
         // 保存用户信息(OAuth2User -> DefaultOAuth2User)到 redis
         redisTemplate.opsForValue().set(
-                USER_INFO + registrationId.toLowerCase() + COLON + authenticationResult.getName(),
+                LOGIN_USER_INFO + registrationId.toLowerCase() + COLON + authenticationResult.getName(),
                 authenticationResult.getPrincipal()
         );
         log.info("oauth2 认证后的用户信息:{}", JSON.toJSONString(authenticationResult.getPrincipal()));
@@ -365,7 +373,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("未进行 oauth2 登录，无法获取 oauth2 令牌");
         }
         OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
-                USER_INFO + registrationId.toLowerCase() + COLON + name);
+                LOGIN_USER_INFO + registrationId.toLowerCase() + COLON + name);
         if (oAuth2User == null) {
             throw new RuntimeException("当前用户未登录");
         }
@@ -384,10 +392,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         COLON + issuedAt + COLON + (issuedAt + REFRESH_TOKEN_EXPIRES_TIME));
         // 保存访问令牌和刷新令牌到 redis
         redisTemplate.opsForValue().set(
-                USER_ACCESS_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
+                LOGIN_USER_ACCESS_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
                 accessToken, EXPIRES_TIME, TimeUnit.MILLISECONDS);
         redisTemplate.opsForValue().set(
-                USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
+                LOGIN_USER_REFRESH_TOKEN + registrationId.toLowerCase() + COLON + oAuth2User.getName(),
                 refreshToken, REFRESH_TOKEN_EXPIRES_TIME, TimeUnit.MILLISECONDS);
         LoginSuccessVO vo = LoginSuccessVO
                 .builder()

@@ -41,7 +41,8 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     private static final String INVALID_USER_INFO_RESPONSE_ERROR_CODE = "invalid_user_info_response";
 
     private static final ParameterizedTypeReference<Map<String, Object>> PARAMETERIZED_RESPONSE_TYPE =
-            new ParameterizedTypeReference<>() { };
+            new ParameterizedTypeReference<>() {
+            };
 
     private final Converter<OAuth2UserRequest, RequestEntity<?>>
             requestEntityConverter = new OAuth2UserRequestEntityConverter();
@@ -61,8 +62,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
                 .hasText(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri())) {
             OAuth2Error oauth2Error = new OAuth2Error(MISSING_USER_INFO_URI_ERROR_CODE,
                     "Missing required UserInfo Uri in UserInfoEndpoint for Client Registration: "
-                            + userRequest.getClientRegistration().getRegistrationId(),
-                    null);
+                            + userRequest.getClientRegistration().getRegistrationId(), null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
         }
         String userNameAttributeName = userRequest.getClientRegistration()
@@ -91,8 +91,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
     private ResponseEntity<Map<String, Object>> getResponse(OAuth2UserRequest userRequest, RequestEntity<?> request) {
         try {
             return this.restOperations.exchange(request, PARAMETERIZED_RESPONSE_TYPE);
-        }
-        catch (OAuth2AuthorizationException ex) {
+        } catch (OAuth2AuthorizationException ex) {
             OAuth2Error oauth2Error = ex.getError();
             StringBuilder errorDetails = new StringBuilder();
             errorDetails.append("Error details: [");
@@ -107,12 +106,10 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
                     "An error occurred while attempting to retrieve the UserInfo Resource: " + errorDetails,
                     null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
-        }
-        catch (UnknownContentTypeException ex) {
+        } catch (UnknownContentTypeException ex) {
             OAuth2Error oauth2Error = getoAuth2Error(userRequest, ex);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
-        }
-        catch (RestClientException ex) {
+        } catch (RestClientException ex) {
             OAuth2Error oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
                     "An error occurred while attempting to retrieve the UserInfo Resource: " + ex.getMessage(), null);
             throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);

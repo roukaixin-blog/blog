@@ -41,12 +41,18 @@ import java.util.function.Consumer;
 @Setter
 @Getter
 @Slf4j
-public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
+public class OAuth2AuthorizationRequestResolverImpl implements OAuth2AuthorizationRequestResolver {
 
     private String registrationId;
 
+    /**
+     * uri 默认分隔符
+     */
     private static final char PATH_DELIMITER = '/';
 
+    /**
+     * OAuth2 路径中的 state 参数生成器
+     */
     private static final StringKeyGenerator DEFAULT_STATE_GENERATOR = new Base64StringKeyGenerator(
             Base64.getUrlEncoder());
 
@@ -62,8 +68,8 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
     private Consumer<OAuth2AuthorizationRequest.Builder> authorizationRequestCustomizer = (customizer) -> {
     };
 
-    public CustomizeOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository,
-                                                       String registrationId) {
+    public OAuth2AuthorizationRequestResolverImpl(ClientRegistrationRepository clientRegistrationRepository,
+                                                  String registrationId) {
         this.clientRegistrationRepository = clientRegistrationRepository;
         Assert.hasText(registrationId, "[CustomizeOAuth2AuthorizationRequestResolver] registrationId 不能为空");
         this.registrationId = registrationId;
@@ -116,11 +122,9 @@ public class CustomizeOAuth2AuthorizationRequestResolver implements OAuth2Author
 
     private OAuth2AuthorizationRequest.Builder getBuilder(ClientRegistration clientRegistration) {
         if (AuthorizationGrantType.AUTHORIZATION_CODE.equals(clientRegistration.getAuthorizationGrantType())) {
-            // @formatter:off
             OAuth2AuthorizationRequest.Builder builder = OAuth2AuthorizationRequest.authorizationCode()
                     .attributes((attrs) ->
                             attrs.put(OAuth2ParameterNames.REGISTRATION_ID, clientRegistration.getRegistrationId()));
-            // @formatter:on
             if (!CollectionUtils.isEmpty(clientRegistration.getScopes())
                     && clientRegistration.getScopes().contains(OidcScopes.OPENID)) {
                 // Section 3.1.2.1 Authentication Request -
