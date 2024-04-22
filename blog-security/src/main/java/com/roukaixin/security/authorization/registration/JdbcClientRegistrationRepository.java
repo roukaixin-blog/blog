@@ -1,4 +1,4 @@
-package com.roukaixin.security.authorization.service.impl;
+package com.roukaixin.security.authorization.registration;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.roukaixin.common.exception.OAuth2Exception;

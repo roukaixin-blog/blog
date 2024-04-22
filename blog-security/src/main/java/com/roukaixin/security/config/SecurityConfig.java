@@ -5,7 +5,7 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Multimap;
 import com.roukaixin.security.annotation.NoPermitLogin;
 import com.roukaixin.security.authorization.filter.AuthenticationFiler;
-import com.roukaixin.security.authorization.service.impl.JdbcClientRegistrationRepository;
+import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
 import com.roukaixin.security.authorization.service.impl.OAuth2UserServiceImpl;
 import com.roukaixin.security.authorization.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
 import com.roukaixin.security.authorization.service.impl.UsernamePasswordUserDetailsServiceImpl;

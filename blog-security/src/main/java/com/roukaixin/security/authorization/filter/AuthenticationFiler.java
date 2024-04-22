@@ -4,7 +4,7 @@ package com.roukaixin.security.authorization.filter;
 import com.roukaixin.common.pojo.R;
 import com.roukaixin.common.utils.AesUtils;
 import com.roukaixin.common.utils.JsonUtils;
-import com.roukaixin.security.authorization.service.impl.JdbcClientRegistrationRepository;
+import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
 import com.roukaixin.security.constant.LoginConstant;
 import com.roukaixin.security.constant.RedisConstant;
 import com.roukaixin.security.pojo.OAuth2User;
@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExchange;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -116,7 +117,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
             case LoginConstant.SYSTEM -> {
                 // 获取用户信息
                 User user = (User) redisTemplate.opsForValue().get(
-                        LoginConstant.USER_INFO + LoginConstant.SYSTEM + RedisConstant.COLON +
+                        LoginConstant.LOGIN_USER_INFO + LoginConstant.SYSTEM + RedisConstant.COLON +
                                 tokenSplit[1]);
                 logUserInfo(JsonUtils.toJsonString(user));
                 if (user != null) {
@@ -135,7 +136,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
             case LoginConstant.OAUTH2 -> {
                 // 从 redis 获取 oauth2 用户信息。
                 OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
-                        LoginConstant.USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]);
+                        LoginConstant.LOGIN_USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]);
                 logUserInfo(JsonUtils.toJsonString(oAuth2User));
                 ClientRegistration clientRegistration = jdbcClientRegistrationRepository
                         .findByRegistrationId(tokenSplit[1]);
@@ -146,12 +147,17 @@ public class AuthenticationFiler extends OncePerRequestFilter {
                                     clientRegistration,
                                     new OAuth2AuthorizationExchange(
                                             OAuth2AuthorizationRequest.authorizationCode()
-                                                    .authorizationUri(
-                                                            clientRegistration
-                                                                    .getProviderDetails()
-                                                                    .getAuthorizationUri()
+                                                    .attributes((attrs) ->
+                                                            attrs.put(
+                                                                    OAuth2ParameterNames.REGISTRATION_ID,
+                                                                    clientRegistration.getRegistrationId()
+                                                            )
                                                     )
                                                     .clientId(clientRegistration.getClientId())
+                                                    .authorizationUri(
+                                                            clientRegistration
+                                                                    .getProviderDetails().getAuthorizationUri()
+                                                    )
                                                     .redirectUri(clientRegistration.getRedirectUri())
                                                     .scopes(clientRegistration.getScopes())
                                                     .build(),
