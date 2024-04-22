@@ -52,6 +52,7 @@ public class PasswordEncoderConfig {
 
     @Bean
     @Conditional(NoOpConditional.class)
+    @SuppressWarnings("deprecation")
     public PasswordEncoder noop() {
         return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
     }
