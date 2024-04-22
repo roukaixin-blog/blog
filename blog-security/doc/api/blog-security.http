@@ -1,3 +1,4 @@
+###
 # @name = "账号密码登录"
 # @no-log
 POST {{baseUrl}}/authentication/login/username/password
@@ -9,28 +10,30 @@ Content-Type: application/json
 }
 
 > {%
-if (response.status == 200) {
-    client.global.set("access_token", response.body.data.accessToken);
-} else {
-    client.log(response.body);
-}
+    if (response.status == 200) {
+        client.global.set("access_token", response.body.data.accessToken);
+    } else {
+        client.log(response.body);
+    }
 %}
 
 ###
-
-
 # @name = "OAuth2 登录"
 # @no-log
+< {%
+    request.variables.set("registrationId", "github")
+%}
 GET {{baseUrl}}/authentication/oauth2/authorization/{{registrationId}}
 
 
 
 ###
-
-@registrationId = github
-@state = R2x1AQTN6ysuLoLXWjD9bbx7ePHCTu2hqsniNxMUuDk=
 # @name = "获取 oauth2 登录之后的系统令牌"
 # @no-log
+< {%
+    request.variables.set("registrationId", "github")
+    request.variables.set("state", "oqfrtv9j5g98z0p5MWF7_Dzp7IqAnnzSHJFvTs8tKjw=")
+%}
 POST {{baseUrl}}/authentication/oauth2/token/{{registrationId}}
 Content-Type: application/x-www-form-urlencoded
 
@@ -44,7 +47,6 @@ state = {{state}}
 
 
 ###
-
 # @no-log
 # @name = "用户信息"
 GET {{baseUrl}}/user/userinfo
