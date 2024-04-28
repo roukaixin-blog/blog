@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author 不北咪
  * @date 2024/1/19 上午10:40
  */
-@Service
+@Service("usernamePasswordUserDetailsPasswordService")
 public class UsernamePasswordUserDetailsPasswordServiceImpl implements UserDetailsPasswordService {
 
     @Resource

@@ -27,7 +27,7 @@ import java.util.Set;
  * @author 不北咪
  * @date 2024/1/19 上午10:42
  */
-@Service
+@Service("usernamePasswordUserDetailsService")
 public class UsernamePasswordUserDetailsServiceImpl implements UserDetailsService {
 
     private final UserMapper userMapper;

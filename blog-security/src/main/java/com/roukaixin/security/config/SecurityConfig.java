@@ -7,12 +7,11 @@ import com.roukaixin.security.annotation.NoPermitLogin;
 import com.roukaixin.security.authorization.filter.AuthenticationFiler;
 import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
 import com.roukaixin.security.authorization.service.impl.OAuth2UserServiceImpl;
-import com.roukaixin.security.authorization.service.impl.UsernamePasswordUserDetailsPasswordServiceImpl;
-import com.roukaixin.security.authorization.service.impl.UsernamePasswordUserDetailsServiceImpl;
-import com.roukaixin.security.handler.NotAuthenticationHandler;
 import com.roukaixin.security.constant.SwaggerConstant;
+import com.roukaixin.security.handler.NotAuthenticationHandler;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,6 +25,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
@@ -77,10 +78,12 @@ public class SecurityConfig {
     }
 
     @Resource
-    private UsernamePasswordUserDetailsServiceImpl usernamePasswordUserDetailsService;
+    @Qualifier("usernamePasswordUserDetailsService")
+    private UserDetailsService usernamePasswordUserDetailsService;
 
     @Resource
-    private UsernamePasswordUserDetailsPasswordServiceImpl usernamePasswordUserDetailsPasswordService;
+    @Qualifier("usernamePasswordUserDetailsPasswordService")
+    private UserDetailsPasswordService usernamePasswordUserDetailsPasswordService;
 
     @Resource
     private OAuth2UserServiceImpl oAuth2UserService;
