@@ -3,6 +3,7 @@ package com.roukaixin.common.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.roukaixin.common.exception.JsonException;
 
 /**
@@ -14,7 +15,7 @@ public class JsonUtils {
 
     private final static ObjectMapper MAPPER = new ObjectMapper();
 
-    private final static Gson GSON = new Gson();
+    private final static Gson GSON = new GsonBuilder().disableHtmlEscaping().create();
 
     private JsonUtils(){
 
