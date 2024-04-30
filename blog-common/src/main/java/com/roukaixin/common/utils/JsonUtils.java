@@ -2,6 +2,7 @@ package com.roukaixin.common.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.roukaixin.common.exception.JsonException;
 
 /**
@@ -13,8 +14,14 @@ public class JsonUtils {
 
     private final static ObjectMapper MAPPER = new ObjectMapper();
 
+    private final static Gson GSON = new Gson();
+
     private JsonUtils(){
 
+    }
+
+    public static Gson gson() {
+        return GSON;
     }
 
     public static String toJsonString(Object value){
