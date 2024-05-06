@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -17,7 +18,7 @@ import java.util.*;
  */
 @Setter
 @NoArgsConstructor
-public class OAuth2User implements org.springframework.security.oauth2.core.user.OAuth2User {
+public class DefaultOAuth2User implements OAuth2User {
 
     private String name;
 
@@ -28,7 +29,7 @@ public class OAuth2User implements org.springframework.security.oauth2.core.user
     @Getter
     private String nameAttributeKey;
 
-    public OAuth2User(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes,
+    public DefaultOAuth2User(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes,
                       String nameAttributeKey) {
         Assert.notEmpty(attributes, "attributes cannot be empty");
         Assert.hasText(nameAttributeKey, "nameAttributeKey cannot be empty");

@@ -2,6 +2,7 @@ package com.roukaixin.security.authorization.userdetails;
 
 import com.roukaixin.security.authorization.authority.OAuth2UserAuthority;
 import com.roukaixin.security.authorization.authority.SimpleGrantedAuthority;
+import com.roukaixin.security.pojo.DefaultOAuth2User;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;
@@ -91,7 +92,7 @@ public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserReq
         for (String authority : token.getScopes()) {
             authorities.add(new SimpleGrantedAuthority("SCOPE_" + authority));
         }
-        return new com.roukaixin.security.pojo.OAuth2User(authorities, userAttributes, userNameAttributeName);
+        return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);
     }
 
     private ResponseEntity<Map<String, Object>> getResponse(OAuth2UserRequest userRequest, RequestEntity<?> request) {
