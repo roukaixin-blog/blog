@@ -6,8 +6,8 @@ import com.roukaixin.common.exception.OAuth2Exception;
 import com.roukaixin.common.pojo.R;
 import com.roukaixin.common.utils.AesUtils;
 import com.roukaixin.common.utils.JsonUtils;
-import com.roukaixin.security.authorization.resolver.OAuth2AuthorizationRequestResolverImpl;
 import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
+import com.roukaixin.security.authorization.resolver.DefaultOAuth2AuthorizationRequestResolver;
 import com.roukaixin.security.mapper.ClientRegistrationMapper;
 import com.roukaixin.security.pojo.User;
 import com.roukaixin.security.pojo.dto.UserDTO;
@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -64,6 +65,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Resource
     private AuthenticationManager authenticationManager;
@@ -164,25 +168,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                                           HttpServletResponse response, String registrationId) {
         Assert.notNull(request, "request cannot be null");
         Assert.notNull(response, "response cannot be null");
-        // 保存 OAuth2AuthorizationRequest，回调之后会用到 OAuth2AuthorizationRequest
-        com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest build =
-                com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest
-                        .builder()
-                        .authorizationUri(authorizationRequest.getAuthorizationUri())
-                        .authorizationGrantType(authorizationRequest.getGrantType().getValue())
-                        .responseType(authorizationRequest.getResponseType().getValue())
-                        .clientId(authorizationRequest.getClientId())
-                        .redirectUri(authorizationRequest.getRedirectUri())
-                        .scopes(authorizationRequest.getScopes())
-                        .state(authorizationRequest.getState())
-                        .additionalParameters(authorizationRequest.getAdditionalParameters())
-                        .authorizationRequestUri(authorizationRequest.getAuthorizationRequestUri())
-                        .attributes(authorizationRequest.getAttributes())
-                        .build();
-        // 保存到 redis 中，key：state
-        redisTemplate.opsForValue().set(
+        // 保存 OAuth2AuthorizationRequest 到 redis[key:state] 中，回调之后会用到 OAuth2AuthorizationRequest。
+        stringRedisTemplate.opsForValue().set(
                 registrationId.toLowerCase() + COLON + STATE + authorizationRequest.getState(),
-                build,
+                JsonUtils.gson().toJson(authorizationRequest),
                 3,
                 TimeUnit.MINUTES
         );
@@ -204,30 +193,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             // 不是认证响应
             throw new OAuth2Exception(new OAuth2Error(OAuth2ErrorCodes.INVALID_REQUEST).toString());
         }
-        // 获取 OAuth2AuthorizationRequest，从 redis 中获取
-        com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest authorizationRequest =
-                (com.roukaixin.security.authorization.endpoint.OAuth2AuthorizationRequest) redisTemplate.opsForValue()
-                        .get(
-                                registrationId.toLowerCase() + COLON + STATE + state
-                        );
-        if (authorizationRequest == null) {
+        // 获取 OAuth2AuthorizationRequest，从 redis 中获取。
+        // 用于构建 OAuth2AuthorizationExchange 中的 OAuth2AuthorizationRequest 信息
+        String authorizationRequestString = stringRedisTemplate.opsForValue().get(
+                registrationId.toLowerCase() + COLON + STATE + state
+        );
+        if (authorizationRequestString == null) {
             // 获取不到 redis 的 AuthorizationRequest
             OAuth2Error oauth2Error = new OAuth2Error("authorization_request_not_found");
             throw new OAuth2Exception(oauth2Error.toString());
         }
+        OAuth2AuthorizationRequest oAuth2AuthorizationRequest = JsonUtils.gson()
+                .fromJson(authorizationRequestString, OAuth2AuthorizationRequest.class);
         // 可以获取到 AuthorizationRequest，所以把 redis 中 AuthorizationRequest 的删除掉，表示一个 state 只能用一次
         redisTemplate.delete(registrationId.toLowerCase() + COLON + STATE + state);
-        // 构建 OAuth2AuthorizationExchange 中的 OAuth2AuthorizationRequest 信息
-        OAuth2AuthorizationRequest.Builder oAuth2AuthorizationRequestBuilder = OAuth2AuthorizationRequest
-                .authorizationCode()
-                .authorizationUri(authorizationRequest.getAuthorizationUri())
-                .clientId(authorizationRequest.getClientId())
-                .redirectUri(authorizationRequest.getRedirectUri())
-                .scopes(authorizationRequest.getScopes())
-                .state(authorizationRequest.getState())
-                .additionalParameters(authorizationRequest.getAdditionalParameters())
-                .authorizationRequestUri(authorizationRequest.getAuthorizationRequestUri())
-                .attributes(authorizationRequest.getAttributes());
         // 构建 OAuth2AuthorizationExchange 中的 ClientRegistration
         ClientRegistration clientRegistration = jdbcClientRegistrationRepository.findByRegistrationId(registrationId);
         // 格式化 redirectUri 并校验是否是 uri 请求
@@ -239,7 +218,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         OAuth2AuthorizationResponse authorizationResponse = convert(params, redirectUri);
         // 构建未认证 Authentication。
         OAuth2LoginAuthenticationToken authenticationRequest = new OAuth2LoginAuthenticationToken(clientRegistration,
-                new OAuth2AuthorizationExchange(oAuth2AuthorizationRequestBuilder.build(), authorizationResponse));
+                new OAuth2AuthorizationExchange(oAuth2AuthorizationRequest, authorizationResponse));
         // 调用认证管理器进行认证，返回经过认证的 Authentication。
         OAuth2LoginAuthenticationToken authenticationResult = (OAuth2LoginAuthenticationToken) authenticationManager
                 .authenticate(authenticationRequest);
