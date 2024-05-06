@@ -1,7 +1,7 @@
-package com.roukaixin.security.authorization.service.impl;
+package com.roukaixin.security.authorization.userdetails;
 
-import com.roukaixin.security.authorization.authority.SimpleGrantedAuthority;
 import com.roukaixin.security.authorization.authority.OAuth2UserAuthority;
+import com.roukaixin.security.authorization.authority.SimpleGrantedAuthority;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.RequestEntity;
@@ -19,7 +19,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.*;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.UnknownContentTypeException;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -32,7 +35,7 @@ import java.util.Set;
  * @date 2024/3/10 下午9:03
  */
 @Service
-public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class DefaultOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private static final String MISSING_USER_INFO_URI_ERROR_CODE = "missing_user_info_uri";
 
@@ -49,7 +52,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService<OAuth2UserReques
 
     private final RestOperations restOperations;
 
-    public OAuth2UserServiceImpl() {
+    public DefaultOAuth2UserService() {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
         this.restOperations = restTemplate;

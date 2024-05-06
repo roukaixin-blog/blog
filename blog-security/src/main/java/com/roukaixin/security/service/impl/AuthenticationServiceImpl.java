@@ -121,8 +121,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void oauth2RequestRedirect(String registrationId, String redirect,
                                       HttpServletRequest request, HttpServletResponse response) {
-        OAuth2AuthorizationRequestResolverImpl resolver =
-                new OAuth2AuthorizationRequestResolverImpl(jdbcClientRegistrationRepository, registrationId);
+        DefaultOAuth2AuthorizationRequestResolver resolver =
+                new DefaultOAuth2AuthorizationRequestResolver(jdbcClientRegistrationRepository, registrationId);
         OAuth2AuthorizationRequest authorizationRequest = resolver.resolve(request);
         try {
             sendRedirectForAuthorization(request, response, authorizationRequest, registrationId);

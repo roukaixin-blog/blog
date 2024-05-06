@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * 解析构建OAuth2AuthorizationRequest 对象。参考：DefaultOAuth2AuthorizationRequestResolver类
+ * 解析构建 OAuth2AuthorizationRequest 对象。参考：DefaultOAuth2AuthorizationRequestResolver 类
  *
  * @author 不北咪
  * @date 2024/3/6 下午3:41
@@ -41,7 +41,8 @@ import java.util.function.Consumer;
 @Setter
 @Getter
 @Slf4j
-public class OAuth2AuthorizationRequestResolverImpl implements OAuth2AuthorizationRequestResolver {
+public class DefaultOAuth2AuthorizationRequestResolver
+        implements OAuth2AuthorizationRequestResolver {
 
     private String registrationId;
 
@@ -68,8 +69,8 @@ public class OAuth2AuthorizationRequestResolverImpl implements OAuth2Authorizati
     private Consumer<OAuth2AuthorizationRequest.Builder> authorizationRequestCustomizer = (customizer) -> {
     };
 
-    public OAuth2AuthorizationRequestResolverImpl(ClientRegistrationRepository clientRegistrationRepository,
-                                                  String registrationId) {
+    public DefaultOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository,
+                                              String registrationId) {
         this.clientRegistrationRepository = clientRegistrationRepository;
         Assert.hasText(registrationId, "[CustomizeOAuth2AuthorizationRequestResolver] registrationId 不能为空");
         this.registrationId = registrationId;
