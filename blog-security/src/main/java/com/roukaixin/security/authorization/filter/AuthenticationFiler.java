@@ -7,7 +7,7 @@ import com.roukaixin.common.utils.JsonUtils;
 import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
 import com.roukaixin.security.constant.LoginConstant;
 import com.roukaixin.security.constant.RedisConstant;
-import com.roukaixin.security.pojo.OAuth2User;
+import com.roukaixin.security.pojo.DefaultOAuth2User;
 import com.roukaixin.security.pojo.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,22 +16,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationExchange;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationResponse;
-import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 
 /**
  * 校验 token 是否存在、合法
@@ -135,48 +130,22 @@ public class AuthenticationFiler extends OncePerRequestFilter {
             }
             case LoginConstant.OAUTH2 -> {
                 // 从 redis 获取 oauth2 用户信息。
-                OAuth2User oAuth2User = (OAuth2User) redisTemplate.opsForValue().get(
-                        LoginConstant.LOGIN_USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]);
+                DefaultOAuth2User oAuth2User = (DefaultOAuth2User) redisTemplate.opsForValue().get(
+                        LoginConstant.LOGIN_USER_INFO + tokenSplit[1] + RedisConstant.COLON + tokenSplit[2]
+                );
                 logUserInfo(JsonUtils.toJsonString(oAuth2User));
                 ClientRegistration clientRegistration = jdbcClientRegistrationRepository
                         .findByRegistrationId(tokenSplit[1]);
                 if (oAuth2User != null) {
-                    // 构建 OAuth2LoginAuthenticationToken
-                    OAuth2LoginAuthenticationToken oAuth2LoginAuthenticationToken =
-                            new OAuth2LoginAuthenticationToken(
-                                    clientRegistration,
-                                    new OAuth2AuthorizationExchange(
-                                            OAuth2AuthorizationRequest.authorizationCode()
-                                                    .attributes((attrs) ->
-                                                            attrs.put(
-                                                                    OAuth2ParameterNames.REGISTRATION_ID,
-                                                                    clientRegistration.getRegistrationId()
-                                                            )
-                                                    )
-                                                    .clientId(clientRegistration.getClientId())
-                                                    .authorizationUri(
-                                                            clientRegistration
-                                                                    .getProviderDetails().getAuthorizationUri()
-                                                    )
-                                                    .redirectUri(clientRegistration.getRedirectUri())
-                                                    .scopes(clientRegistration.getScopes())
-                                                    .build(),
-                                            OAuth2AuthorizationResponse
-                                                    .success(accessToken)
-                                                    .redirectUri(clientRegistration.getRedirectUri())
-                                                    .build()
-                                    ),
+                    // 构建 OAuth2AuthenticationToken
+                    OAuth2AuthenticationToken oAuth2AuthenticationToken =
+                            new OAuth2AuthenticationToken(
                                     oAuth2User,
                                     oAuth2User.getAuthorities(),
-                                    new OAuth2AccessToken(
-                                            OAuth2AccessToken.TokenType.BEARER,
-                                            accessToken,
-                                            Instant.ofEpochMilli(Long.parseLong(tokenSplit[tokenSplit.length - 2])),
-                                            Instant.ofEpochMilli(Long.parseLong(tokenSplit[tokenSplit.length - 1]))
-                                    )
+                                    clientRegistration.getRegistrationId()
                             );
                     SecurityContextHolder.getContext()
-                            .setAuthentication(oAuth2LoginAuthenticationToken);
+                            .setAuthentication(oAuth2AuthenticationToken);
                 }
                 filterChain.doFilter(request, response);
             }
@@ -194,7 +163,7 @@ public class AuthenticationFiler extends OncePerRequestFilter {
      */
     private void sendResponse(int status, String message, HttpServletResponse response) throws IOException {
         response.setStatus(status);
-        response.setContentType("application/json");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.getWriter().write(JsonUtils.toJsonString(R.error(status, message)));
         response.getWriter().flush();
