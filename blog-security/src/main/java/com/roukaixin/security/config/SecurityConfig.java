@@ -6,12 +6,9 @@ import com.google.common.collect.Multimap;
 import com.roukaixin.security.annotation.NoPermitLogin;
 import com.roukaixin.security.authorization.filter.AuthenticationFiler;
 import com.roukaixin.security.authorization.registration.JdbcClientRegistrationRepository;
-import com.roukaixin.security.authorization.service.impl.OAuth2UserServiceImpl;
 import com.roukaixin.security.constant.SwaggerConstant;
 import com.roukaixin.security.handler.NotAuthenticationHandler;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +28,9 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationProvider;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.util.ObjectUtils;
@@ -64,29 +64,30 @@ public class SecurityConfig {
 
     private final JdbcClientRegistrationRepository jdbcClientRegistrationRepository;
 
+    private final UserDetailsService usernamePasswordUserDetailsService;
+
+    private final UserDetailsPasswordService usernamePasswordUserDetailsPasswordService;
+
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> defaultOAuth2UserService;
+
     @Autowired
     public SecurityConfig(List<AuthenticationProvider> authenticationProviders,
                           Map<String, PasswordEncoder> encoders,
                           RequestMappingHandlerMapping requestMappingHandlerMapping,
                           RedisTemplate<String, Object> redisTemplate,
-                          JdbcClientRegistrationRepository jdbcClientRegistrationRepository) {
+                          JdbcClientRegistrationRepository jdbcClientRegistrationRepository,
+                          UserDetailsService usernamePasswordUserDetailsService,
+                          UserDetailsPasswordService usernamePasswordUserDetailsPasswordService,
+                          OAuth2UserService<OAuth2UserRequest, OAuth2User> defaultOAuth2UserService) {
         this.authenticationProviders = authenticationProviders;
         this.encoders = encoders;
         this.requestMappingHandlerMapping = requestMappingHandlerMapping;
         this.redisTemplate = redisTemplate;
         this.jdbcClientRegistrationRepository = jdbcClientRegistrationRepository;
+        this.usernamePasswordUserDetailsService = usernamePasswordUserDetailsService;
+        this.usernamePasswordUserDetailsPasswordService = usernamePasswordUserDetailsPasswordService;
+        this.defaultOAuth2UserService = defaultOAuth2UserService;
     }
-
-    @Resource
-    @Qualifier("usernamePasswordUserDetailsService")
-    private UserDetailsService usernamePasswordUserDetailsService;
-
-    @Resource
-    @Qualifier("usernamePasswordUserDetailsPasswordService")
-    private UserDetailsPasswordService usernamePasswordUserDetailsPasswordService;
-
-    @Resource
-    private OAuth2UserServiceImpl oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -226,8 +227,6 @@ public class SecurityConfig {
         return new ProviderManager(authenticationProviders);
     }
 
-
-
     public AuthenticationProvider usernamePasswordAuthenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setPasswordEncoder(passwordEncoder());
@@ -239,7 +238,7 @@ public class SecurityConfig {
     public AuthenticationProvider oauth2AuthenticationProvider() {
         return new OAuth2LoginAuthenticationProvider(
                 new DefaultAuthorizationCodeTokenResponseClient(),
-                oAuth2UserService
+                defaultOAuth2UserService
         );
     }
 }

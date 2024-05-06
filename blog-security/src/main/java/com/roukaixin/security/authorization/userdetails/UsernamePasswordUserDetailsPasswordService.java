@@ -1,4 +1,4 @@
-package com.roukaixin.security.authorization.service.impl;
+package com.roukaixin.security.authorization.userdetails;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.roukaixin.security.mapper.UserMapper;
@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
  * @author 不北咪
  * @date 2024/1/19 上午10:40
  */
-@Service("usernamePasswordUserDetailsPasswordService")
-public class UsernamePasswordUserDetailsPasswordServiceImpl implements UserDetailsPasswordService {
+@Service
+public class UsernamePasswordUserDetailsPasswordService implements UserDetailsPasswordService {
 
     @Resource
     private UserMapper userMapper;

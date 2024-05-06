@@ -1,4 +1,4 @@
-package com.roukaixin.security.authorization.service.impl;
+package com.roukaixin.security.authorization.userdetails;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.roukaixin.security.authorization.authority.SimpleGrantedAuthority;
@@ -27,8 +27,8 @@ import java.util.Set;
  * @author 不北咪
  * @date 2024/1/19 上午10:42
  */
-@Service("usernamePasswordUserDetailsService")
-public class UsernamePasswordUserDetailsServiceImpl implements UserDetailsService {
+@Service
+public class UsernamePasswordUserDetailsService implements UserDetailsService {
 
     private final UserMapper userMapper;
 
@@ -39,7 +39,7 @@ public class UsernamePasswordUserDetailsServiceImpl implements UserDetailsServic
     private final AuthoritiesMapper authoritiesMapper;
 
     @Autowired
-    public UsernamePasswordUserDetailsServiceImpl(UserMapper userMapper,
+    public UsernamePasswordUserDetailsService(UserMapper userMapper,
                                                   UserRoleMapper userRoleMapper,
                                                   RoleAuthoritiesMapper roleAuthoritiesMapper,
                                                   AuthoritiesMapper authoritiesMapper) {
