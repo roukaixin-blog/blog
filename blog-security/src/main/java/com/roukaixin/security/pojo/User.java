@@ -46,30 +46,29 @@ public class User implements UserDetails {
     /**
      * 账号是否过期（1过期，0未过期）
      */
-    private short isAccountNonExpired;
+    private int isAccountNonExpired;
 
     /**
      * 账号是否被锁定（1锁定，0未锁定）
      */
-    private short isAccountNonLocked;
+    private int isAccountNonLocked;
 
     /**
      * 凭证是否过期（1过期，0未过期）
      */
-    private short isCredentialsNonExpired;
+    private int isCredentialsNonExpired;
 
     /**
      * 账号是否启用（1启用，0未启用）
      */
-    @TableField(value = "is_enabled")
-    private short enabled;
+    private int isEnabled;
 
     /**
      * 是否删除（1删除，0未删除），逻辑删除字段
      */
     @Getter
     @TableLogic
-    private short isDeleted;
+    private int isDeleted;
 
     @TableField(exist = false)
     private Set<GrantedAuthority> authorities;
@@ -107,6 +106,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.enabled != 0;
+        return this.isEnabled != 0;
     }
 }
