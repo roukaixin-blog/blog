@@ -18,7 +18,7 @@ import java.util.Set;
  * @date 2024/1/19 上午11:14
  * @TableName sys_user
  */
-@TableName(value ="sys_user")
+@TableName(value = "sys_user")
 @ToString
 @Setter
 @Builder
@@ -46,34 +46,30 @@ public class User implements UserDetails {
     /**
      * 账号是否过期（1过期，0未过期）
      */
-    @TableField(value = "is_account_non_expired")
-    private boolean accountNonExpired;
+    private short isAccountNonExpired;
 
     /**
      * 账号是否被锁定（1锁定，0未锁定）
      */
-    @TableField(value = "is_account_non_locked")
-    private boolean accountNonLocked;
+    private short isAccountNonLocked;
 
     /**
      * 凭证是否过期（1过期，0未过期）
      */
-    @TableField(value = "is_credentials_non_expired")
-    private boolean credentialsNonExpired;
+    private short isCredentialsNonExpired;
 
     /**
      * 账号是否启用（1启用，0未启用）
      */
     @TableField(value = "is_enabled")
-    private boolean enabled;
+    private short enabled;
 
     /**
      * 是否删除（1删除，0未删除），逻辑删除字段
      */
     @Getter
-    @TableField("is_deleted")
     @TableLogic
-    private boolean deleted;
+    private short isDeleted;
 
     @TableField(exist = false)
     private Set<GrantedAuthority> authorities;
@@ -96,21 +92,21 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return this.accountNonExpired;
+        return this.isAccountNonExpired != 0;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return this.accountNonLocked;
+        return this.isAccountNonLocked != 0;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return this.accountNonExpired;
+        return this.isAccountNonExpired != 0;
     }
 
     @Override
     public boolean isEnabled() {
-        return this.enabled;
+        return this.enabled != 0;
     }
 }
