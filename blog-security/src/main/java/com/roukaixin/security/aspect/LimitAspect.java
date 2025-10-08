@@ -48,13 +48,14 @@ public class LimitAspect {
     public void doBefore(JoinPoint joinPoint, Limit limit) {
         long time = limit.time();
         long count = limit.count();
-        // 获取保存在 zset 中的 key
+        // 组装 zset 数据的 key
         String key = getZSetKey(joinPoint);
         ZSetOperations<String, Object> zSet = redisTemplate.opsForZSet();
         // 保存到 redis 中
         long millis = System.currentTimeMillis();
+        // key 分数 成员
         zSet.add(key, millis, millis);
-        // 设置过期时间，防止浪费内存
+        // 设置过期时间
         redisTemplate.expire(key, time, TimeUnit.SECONDS);
         // 移除 {time} 秒之前的访问记录（滑动窗口思想）, 根据 score 范围删除
         zSet.removeRangeByScore(key, 0, millis - time * 1000);
